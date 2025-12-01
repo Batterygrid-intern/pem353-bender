@@ -4,13 +4,13 @@
  int main(){
 
     /*@ set config file path
-      @ instantiate configManager object(writes config data to )*/
+      @ instantiating configManager object(writes config data to )*/
 
-    //@ instantiate logger object and use it for all info debug warning and error information
+    //@ instantiate a logger object and use it for all info debug warning and error information
 
     //@ instantiate data object which will hold all data read from the pem353
 
-    //@ instantiate ModbusRtu master(client) which will read data from pem353
+    //@ instantiate ModbusRtu master(client) which will read data from pem353,
     //load it with configs
 
     //@ instantiate modbusTCP slave(server) which will store data from the data object
@@ -18,8 +18,13 @@
     //@ instantiate mqtt_publish client which will publish data from dataObject
 
     //while loop for
+     int one= 1;
     while(true){
-        //read data from pem353 every 50ms
+        //test debugger
+        if (one == 10) break;
+        one++;
+        std::cout << "Hello pem353" << std::endl;
+        //read data from pem353 every 50 ms
 
         //transform data to floats save in data object
 
