@@ -43,8 +43,7 @@ Implement a networking layer on a pem353-bender using a raspberryPi 4.
 
 # Project structure
 ## source code
-All source code are located in **./src**
-**placeholder chatgpt display tree structure**
+
 
 ## Headers
 
