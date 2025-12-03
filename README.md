@@ -77,7 +77,3 @@ Toolchain file to be able to cross compile from host machine to rpi4 64bit.
 ### nlohmann::json
 
 ### Pahomqttcpp
-
-# Goal of project
-Put a networking layer on a pem353-bender
-1. Read from the modbus registers 
