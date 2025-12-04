@@ -6,11 +6,15 @@
 #define PEM353_PEMDATA_HPP
 
 
-
 class pemData {
+    private:
 
+    public:
+    pemData() = default;
+    ~pemData() = default;
+
+    float
 };
-
 
 
 #endif //PEM353_PEMDATA_HPP
