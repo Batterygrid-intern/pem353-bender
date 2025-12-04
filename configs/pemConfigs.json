@@ -1,0 +1,27 @@
+{
+  "modbus_serial_conn": {
+    "DEVICE": "/dev/ttyAMA0",
+    "BAUD": 9600,
+    "PARITY": "N",
+    "DATA_BITS": 8,
+    "STOP_BITS": 1
+  },
+  "modbus_serial_read": {
+    "SLAVE_ID": 1,
+    "REGISTER": 0,
+    "NUMBER_OF_REGISTERS": 58,
+    "SLEEP_BETWEEN_READS": 50
+  },
+  "modbus_tcp": {
+    "HOST": "192.168.1.100",
+    "PORT": 502
+  },
+  "mqtt": {
+    "HOST": "192.168.1.100",
+    "PORT": 1883
+  },
+  "logging": {
+    "PATH": "./logs/pemlog.txt"
+  }
+
+}
