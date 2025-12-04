@@ -49,7 +49,9 @@ Example of configs needed for this project
 
 ## ConfigManager
 ConfigManager class to read and hold configs from json formated config files.
+
 it uses [nlohmann::json](#nlohmann::json) for json parsing.
+
 ## source code
 
 
@@ -59,11 +61,14 @@ it uses [nlohmann::json](#nlohmann::json) for json parsing.
 
 ### cmake
 cmake is used to build the project.
+
 c++ version is set to 17.
+
 c version is set to 11.
   
 #### Toolchains
 **cmake/toolchains/raspberryPi.cmake**
+
 Toolchain file to be able to cross compile from host machine to rpi4 64bit.
 ### cross compiling
 
@@ -88,7 +93,9 @@ Toolchain file to be able to cross compile from host machine to rpi4 64bit.
 
 ### nlohmann::json
 nlohmann::json header only library.
+
 **Version** v3.12.0
+
 embedded directly in my build system.
 
 
