@@ -5,6 +5,7 @@ Implement a networking layer on a pem353-bender using a raspberryPi 4.
 3. Make the data read available to be read from the raspberry pi over Modbus tcp/ip. 
 4. Publish data read to a mqtt-broker. 
 5. Reads from pem353 every 50-100 ms.
+# Table of Contents
 
 ## Flowchart 
 
@@ -42,6 +43,9 @@ Implement a networking layer on a pem353-bender using a raspberryPi 4.
   - 0057: Status Digital Outputs – UINT16
 
 # Project structure
+
+## configs folder
+Example of configs needed for this project
 ## source code
 
 
