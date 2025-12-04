@@ -6,3 +6,13 @@
 4. finish project structure with all modules i need
 5. build all modules
 6. create documents after every completed task
+
+
+
+# logger
+logga allt ifrån main?
+vill kunna använda klasserna till annat. 
+kasta alla throws till huvud klassen
+
+men för information som är i min klass?
+implementera logger?
