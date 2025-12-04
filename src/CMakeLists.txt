@@ -17,6 +17,11 @@ add_library(configManager STATIC configManager.cpp)
 target_include_directories(configManager
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+#link json library
+target_link_libraries(configManager
+    PUBLIC
+        json
+)
 
 #add executable for project program
 add_subdirectory(include)
@@ -24,8 +29,9 @@ add_executable(${PROJECT_NAME} main.cpp)
 #link libraries for project executable
 target_link_libraries(${PROJECT_NAME}
         PUBLIC
-        modbusTcp
-        modbusRtu
-        mqttPub
-        pemData
+            modbusTcp
+            modbusRtu
+            mqttPub
+            pemData
+
 )

@@ -16,3 +16,10 @@ kasta alla throws till huvud klassen
 
 men för information som är i min klass?
 implementera logger?
+
+
+
+
+# STEG 1 
+implementera nlohmann json i projektet. som header only.
+embedda rakt i cmake? vad behöver jag?

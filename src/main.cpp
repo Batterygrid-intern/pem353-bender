@@ -1,5 +1,5 @@
 #include <iostream>
-#include
+
 
 
  int main(){
@@ -19,12 +19,7 @@
     //@ instantiate mqtt_publish client which will publish data from dataObject
 
     //while loop for
-     int one= 1;
     while(true){
-        //test debugger
-        if (one == 10) break;
-        one++;
-        std::cout << "Hello pem353" << std::endl;
         //read data from pem353 every 50 ms
 
         //transform data to floats save in data object

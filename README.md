@@ -46,6 +46,10 @@ Implement a networking layer on a pem353-bender using a raspberryPi 4.
 
 ## configs folder
 Example of configs needed for this project
+
+## ConfigManager
+ConfigManager class to read and hold configs from json formated config files.
+it uses [nlohmann::json](#nlohmann::json) for json parsing.
 ## source code
 
 
@@ -54,6 +58,10 @@ Example of configs needed for this project
 ## Build tools
 
 ### cmake
+cmake is used to build the project.
+c++ version is set to 17.
+c version is set to 11.
+  
 #### Toolchains
 **cmake/toolchains/raspberryPi.cmake**
 Toolchain file to be able to cross compile from host machine to rpi4 64bit.
@@ -79,5 +87,9 @@ Toolchain file to be able to cross compile from host machine to rpi4 64bit.
 ### spdlog
 
 ### nlohmann::json
+nlohmann::json header only library.
+**Version** v3.12.0
+embedded directly in my build system.
+
 
 ### Pahomqttcpp
