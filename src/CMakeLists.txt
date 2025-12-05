@@ -1,11 +1,11 @@
 #build static library and include header for modbusRtu
-add_library(modbusRtu STATIC modbusRtu.cpp)
-target_include_directories(modbusRtu
+add_library(modbusRTU STATIC modbusRTU.cpp)
+target_include_directories(modbusRTU
        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 #build static library and include header for modbusTcp
-add_library(modbusTcp STATIC modbusTcp.cpp)
-target_include_directories(modbusTcp
+add_library(modbusTCP STATIC modbusTCP.cpp)
+target_include_directories(modbusTCP
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 #Build static library and include header for mqttPub
@@ -21,6 +21,9 @@ target_include_directories(configManager
 target_link_libraries(configManager
     PUBLIC
         json
+        mqttPub
+        modbusTCP
+        modbusRTU
 )
 
 #add executable for project program
@@ -29,9 +32,9 @@ add_executable(${PROJECT_NAME} main.cpp)
 #link libraries for project executable
 target_link_libraries(${PROJECT_NAME}
         PUBLIC
-            modbusTcp
-            modbusRtu
+            modbusTCP
+            modbusRTU
             mqttPub
             pemData
-
+            configManager
 )
