@@ -1,4 +1,5 @@
 #include <iostream>
+#include "configManager.hpp"
 
 
 
@@ -6,6 +7,11 @@
 
     /*@ set config file path
       @ instantiating configManager object(writes config data to )*/
+     //config manager test
+     std::string configFilePath = "./configs/pemConfigs.json";
+     configManager config(configFilePath);
+     config.printRTUConfigs();
+
 
     //@ instantiate a logger object and use it for all info debug warning and error information
 
@@ -19,7 +25,7 @@
     //@ instantiate mqtt_publish client which will publish data from dataObject
 
     //while loop for
-    while(true){
+    //while(true){
         //read data from pem353 every 50 ms
 
         //transform data to floats save in data object
@@ -29,6 +35,6 @@
         //update modbus slave registers with data from data object
 
         //if program breaks or terminate, terminate it gracefully
-    }
+    //}
      return 0;
 }

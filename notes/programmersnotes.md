@@ -18,6 +18,19 @@ men för information som är i min klass?
 implementera logger?
 
 
+# configManager
+
+**the constructor** reads json from file stores in object and sorts out the configs needed to each sub object
+
+this constructor reads from ifstream the json object parses the ifstream object.
+
+
+if you add config keys in a json
+you need to add that attribute to config manager and the extract_... method.
+
+
+configManager setters will set configs for each object.
+
 
 
 # STEG 1 

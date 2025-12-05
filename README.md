@@ -49,7 +49,17 @@ Example of configs needed for this project
 
 ## ConfigManager
 ConfigManager class to read and hold configs from json formated config files.
+
 it uses [nlohmann::json](#nlohmann::json) for json parsing.
+
+The configManager will for now only work with the objects used in this project like
+- mqttPub
+- modbusTCP
+- modbusRTU
+
+You can change the already existing keys but if you add key you need to recompile.
+
+\* To improve this class or create a resusable library out of it you would need to make it more generic with templates?
 ## source code
 
 
@@ -88,7 +98,9 @@ Toolchain file to be able to cross compile from host machine to rpi4 64bit.
 
 ### nlohmann::json
 nlohmann::json header only library.
+
 **Version** v3.12.0
+
 embedded directly in my build system.
 
 
