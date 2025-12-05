@@ -4,7 +4,7 @@
 
 
 
-class modbusRtu {
+class modbusRTU {
 
 };
 
