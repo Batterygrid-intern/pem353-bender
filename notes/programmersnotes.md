@@ -34,5 +34,11 @@ configManager setters will set configs for each object.
 
 
 # STEG 1 
-implementera nlohmann json i projektet. som header only.
-embedda rakt i cmake? vad behöver jag?
+implementera logger i main.
+implementera modbus rtu client i main
+
+configManager initaliseras i main
+logger initaliserar i main
+modbusRTU initialiseras med configManagern
+och kan logga allt som händer. då blir det att alla objekt initialiseras med loggern.
+

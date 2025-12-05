@@ -6,9 +6,14 @@
 
 class modbusRTU {
     private:
+    //attributes will be all the configs
+    load configs into data object? keep them here?
 
     public:
+    //load configs from configManager and initialise object.
+    modbusRTU();
 
+    void modbusSetConfig(configManager& configManager);
 };
 
 
