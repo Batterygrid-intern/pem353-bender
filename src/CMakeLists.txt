@@ -3,6 +3,10 @@ add_library(modbusRTU STATIC modbusRTU.cpp)
 target_include_directories(modbusRTU
        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+target_link_libraries(modbusRTU
+        PUBLIC
+            configManager
+)
 #build static library and include header for modbusTcp
 add_library(modbusTCP STATIC modbusTCP.cpp)
 target_include_directories(modbusTCP

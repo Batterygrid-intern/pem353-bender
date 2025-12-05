@@ -7,10 +7,9 @@
 
     /*@ set config file path
       @ instantiating configManager object(writes config data to )*/
-     //config manager test
+
      std::string configFilePath = "./configs/pemConfigs.json";
      configManager config(configFilePath);
-     config.printRTUConfigs();
 
 
     //@ instantiate a logger object and use it for all info debug warning and error information
