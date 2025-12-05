@@ -60,6 +60,7 @@ The configManager will for now only work with the objects used in this project l
 You can change the already existing keys but if you add key you need to recompile.
 
 \* To improve this class or create a resusable library out of it you would need to make it more generic with templates?
+
 ## source code
 
 
@@ -69,11 +70,14 @@ You can change the already existing keys but if you add key you need to recompil
 
 ### cmake
 cmake is used to build the project.
+
 c++ version is set to 17.
+
 c version is set to 11.
   
 #### Toolchains
 **cmake/toolchains/raspberryPi.cmake**
+
 Toolchain file to be able to cross compile from host machine to rpi4 64bit.
 ### cross compiling
 
