@@ -2,7 +2,6 @@
 #include "configManager.hpp"
 
 
-
  int main(){
 
     /*@ set config file path
