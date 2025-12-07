@@ -42,3 +42,23 @@ logger initaliserar i main
 modbusRTU initialiseras med configManagern
 och kan logga allt som händer. då blir det att alla objekt initialiseras med loggern.
 
+
+# Design
+## Hardware 
+
+### pem353-bender
+
+### rasppberry pi
+
+### raspberrypi rs-485 hat
+
+## software
+
+### pem353-bender service that runs on the raspberrypi 
+- modbusrtu client that reads data from the pem353
+- publish reads to mqtt broker.
+- runs a modbusTCP server and make the data available to other devices. 
+
+### watchdog to monitor and manage the pem353-bender service
+
+### deployment script
