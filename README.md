@@ -49,18 +49,34 @@ Example of configs needed for this project
 
 ## ConfigManager
 ConfigManager class to read and hold configs from json formated config files.
+## external libraries 
+- [nlohmann::json](#nlohmann::json) for json parsing.
 
-it uses [nlohmann::json](#nlohmann::json) for json parsing.
+This short snippet will instantiate a ConfigManager object and read the config from a JSON file.
 
-The configManager will for now only work with the objects used in this project like
-- mqttPub
-- modbusTCP
-- modbusRTU
+It extracts and separates the Modbus and Mqtt configs to its own JSON objects.
 
-You can change the already existing keys but if you add key you need to recompile.
+With the help of the ConfigManager::getModbusRTUConfig() and ConfigManager::getMqttPubConfig() methods you can access the
+configs as JSON objects.
+```cpp
+ConfigManager configs(filepath);
+json modbusRTUConfig = configs.getModbusRTUConfig();
+json mqttPubConfig = configs.getMqttPubConfig();
+```
 
-\* To improve this class or create a resusable library out of it you would need to make it more generic with templates?
+\* To improve this class or create a resusable library out of it you would need to make it more generic with templates and
+interfaces?
 
+## modbusRTU
+this class is used to read data from a modbus device over RS-485.
+### external libraries
+It uses the [Libmodbus](#Libmodbus) library
+### Project classes the modbusRTU depends on
+- ConfigManager
+- 
+  uses the getModbusRTUConfig() method to get the modbusRTU config from the ConfigManager object at construction.
+- 
+  a modbusRTU object then has full access to all the predetermined settings from the config file.
 ## source code
 
 
