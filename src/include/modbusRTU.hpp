@@ -6,14 +6,13 @@
 
 class modbusRTU {
     private:
-    //attributes will be all the configs
-    load configs into data object? keep them here?
+    //settings will be assigned in the constructor initialisation.
+    json settings;
 
     public:
-    //load configs from configManager and initialise object.
-    modbusRTU();
+    //load configs from configManager and initialize the object.
+    explicit modbusRTU(configManager& configManager);
 
-    void modbusSetConfig(configManager& configManager);
 };
 
 
