@@ -26,10 +26,11 @@ class configManager {
 
         //~configManager();
 
-    //each setter will take an object as argument and set the object with its required configs.
-        void setModbusRtuConfig(modbusRTU& object);
-        void setModbusTcpConfig(modbusTCP& object);
-        void setMqttPubConfig(mqttPub& object);
+        //getters to extract each config set that will be used to initialise the following communcation objectsWW
+        json getModbusRtuConfig();
+        json getModbusTcpConfig();
+        json getMqttPubConfig();
+
 
 };
 

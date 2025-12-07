@@ -30,21 +30,16 @@ configManager::configManager(std::string& configFilePath) {
     extract_mqttPub(config);
 }
 
-//load following objects with its needed configs.
-void configManager::setMqttPubConfig(mqttPub &object) {
-
+//getters that return each object.
+json configManager::getModbusRtuConfig() {
+    return this->modbusRtuConf;
 }
-void configManager::setModbusRtuConfig(modbusRTU &object) {
-
+json configManager::getModbusTcpConfig() {
+    return this->modbusTcpConf;
 }
-void configManager::setModbusTcpConfig(modbusTCP &object) {
-
+json configManager::getMqttPubConfig() {
+    return this->mqttPubConf;
 }
-
-
-
-
-
 //private extract methods to load each attribute with its corresponding configdata
 void configManager::extract_modbusTCP(json &config) {
     if(config.contains("MODBUS_TCP")){
@@ -59,7 +54,7 @@ void configManager::extract_modbusRTU(json &config) {
         this->modbusRtuConf = config["MODBUS_RTU"];
     }
     else {
-        throw std::runtime_error("Modbus RTU config not found");
+throw std::runtime_error("Modbus RTU config not found");
     }
 }
 void configManager::extract_mqttPub(json &config){
