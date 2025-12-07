@@ -6,7 +6,27 @@ Implement a networking layer on a pem353-bender using a raspberryPi 4.
 4. Publish data read to a mqtt-broker. 
 5. Reads from pem353 every 50-100 ms.
 # Table of Contents
+# Design and architecture 
+## Hardware
 
+### pem353-bender
+
+### rasppberry pi 4
+ - 1GB RAM
+ - 64bit OS Lite
+ - 
+### raspberrypi rs-485 hat
+
+## software
+software components that will be built or used in this project
+### pem353-bender service that runs on the raspberrypi
+- modbusrtu client that reads data from the pem353
+- publish reads to mqtt broker.
+- runs a modbusTCP server and makes the data available to other devices.
+
+### watchdog to monitor and manage the pem353-bender service
+
+### deployment script
 ## Flowchart 
 
 ```mermaid  
