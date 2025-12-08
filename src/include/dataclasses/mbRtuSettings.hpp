@@ -2,8 +2,7 @@
 
 //class to hold all the RTU settings.
 #pragma once
-#include "configManager.hpp"
-
+#include <string>
 class mbRtuSettings {
     public:
     //settings for the modbus_t structure used with modbus_new_rtu();

@@ -88,7 +88,18 @@ json mqttPubConfig = configs.getMqttPubConfig();
 interfaces?
 
 ## modbusRTU
-this class is used to read data from a modbus device over RS-485.
+this class is used to read data from a modbus device over RS-485. 
+the constructor takes a ConfigManager object as parameter. and then initialises the modbusRTU object with the settings from the settings class
+1. constructor initializes the modbusRTU object with the settings from the ConfigManager object.
+2. connect() method connects to the modbusRTU device.
+3. readRegisters() method reads the data from the modbusRTU device.
+4. updatePemData() method updates the pemData member variable with the data read from the modbusRTU device.
+and transforms 2 registers into a float value
+## dataclasses
+this directory contains all the dataclasses used in this project. these classes main purpose is to hold data read from the pem353. or settings for the communication classes
+
+### mbRtuSettings 
+this class holds the settings for the modbusRTU class
 ### external libraries
 It uses the [Libmodbus](#Libmodbus) library
 ### Project classes the modbusRTU depends on

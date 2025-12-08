@@ -2,7 +2,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "modbusRTU.hpp"
 
 //constructor object reads json objects and stores data for each attribute in configManager
 

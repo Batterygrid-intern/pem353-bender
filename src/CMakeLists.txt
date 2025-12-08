@@ -6,6 +6,7 @@ target_include_directories(modbusRTU
 target_link_libraries(modbusRTU
         PUBLIC
             configManager
+            PkgConfig::MODBUS
 )
 #build static library and include header for modbusTcp
 add_library(modbusTCP STATIC modbusTCP.cpp)

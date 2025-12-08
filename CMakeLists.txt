@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 #Project name
+find_package(PkgConfig)
+pkg_check_modules(MODBUS REQUIRED IMPORTED_TARGET libmodbus)
 project(pem353 LANGUAGES C CXX)
 
 #Project target binary will be stored in ./bin
