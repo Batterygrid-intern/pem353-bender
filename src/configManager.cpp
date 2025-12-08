@@ -37,14 +37,17 @@ void configManager::loadMbRtuSettings(mbRtuSettings &mbRtuSettings) {
         throw std::runtime_error("MODBUS_RTU settings not found in config file");
     }
     //set all the settings and convert the types needed.
-    mbRtuSettings.device = this->config["MODBUS_RTU"]["DEVICE"];
-    mbRtuSettings.baud = this->config["MODBUS_RTU"]["BAUD"];
+    mbRtuSettings.DEVICE = this->config["MODBUS_RTU"]["DEVICE"];
+    mbRtuSettings.BAUD = this->config["MODBUS_RTU"]["BAUD"];
     const std::string parityStr= this->config["MODBUS_RTU"]["PARITY"];
-    mbRtuSettings.parity = parityStr[0];
-    mbRtuSettings.dataBits = this->config["MODBUS_RTU"]["DATA_BITS"];
-    mbRtuSettings.regStart = this->config["MODBUS_RTU"]["REGSTART"];
-    mbRtuSettings.regEnd = this->config["MODBUS_RTU"]["REGEND"];
+    mbRtuSettings.PARITY = parityStr[0];
+    mbRtuSettings.DATABITS = this->config["MODBUS_RTU"]["DATA_BITS"];
+    mbRtuSettings.STOPBITS = this->config["MODBUS_RTU"]["REGSTART"];
+    mbRtuSettings.SLAVEID = this->config["MODBUS_RTU"]["SLAVEID"];
+    mbRtuSettings.REGSTART = this->config["MODBUS_RTU"]["SLAVEID"];
+    mbRtuSettings.REGEND = this->config["MODBUS_RTU"]["REGEND"];
     mbRtuSettings.TIMEOUT = this->config["MODBUS_RTU"]["TIMEOUT"];
+
 }
 
 
