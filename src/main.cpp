@@ -5,7 +5,7 @@
  int main(){
 
     /*@ set config file path
-      @ instantiating configManager object(writes config data to )*/
+      @ instantiating configManager object(writes config data to settings classes )*/
 
      std::string configFilePath = "./configs/pemConfigs.json";
      configManager config(configFilePath);

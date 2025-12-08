@@ -6,9 +6,9 @@
     "DATA_BITS": 8,
     "STOP_BITS": 1,
     "SLAVE_ID": 1,
-    "REGISTER": 0,
-    "NUMBER_OF_REGISTERS": 58,
-    "SLEEP_BETWEEN_READS": 50
+    "REGSTART": 0,
+    "REGEND": 58,
+    "TIMEOUT": 50
   },
   "MODBUS_TCP": {
     "HOST": "192.168.1.100",

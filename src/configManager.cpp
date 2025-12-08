@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "modbusRTU.hpp"
+
 //constructor object reads json objects and stores data for each attribute in configManager
 
 configManager::configManager(std::string& configFilePath) {
@@ -15,53 +17,37 @@ configManager::configManager(std::string& configFilePath) {
         throw std::runtime_error("Can't open config file: " + std::string(configFilePath));
     }
     //try to parse the filestream and store the parsed data as a json object. catch exception and throw runtime_error
-    //if failed to read.
-    json config;
     try {
-        config = json::parse(configFile);
+       this->config = json::parse(configFile);
     }
     catch (std::exception& e) {
         throw std::runtime_error("Parse error at byte: " + std::string(e.what()) + "\n");
     }
+    //close config file and throw runtime error if failed.
+    configFile.close();
+    if (configFile.fail()) {
+        throw std::runtime_error("Failed to close config file");
+    }
+}
 
-    //extract the data for each attribute declared inside this class and initialise each attribute with that data.
-    extract_modbusTCP(config);
-    extract_modbusRTU(config);
-    extract_mqttPub(config);
+//loads all configs read into settings class for modbusRTU
+void configManager::loadMbRtuSettings(mbRtuSettings &mbRtuSettings) {
+    //if json object doesnot contain HEADKEAY it will throw runtime error
+    if(!this->config.contains("MODBUS_RTU")){
+        throw std::runtime_error("MODBUS_RTU settings not found in config file");
+    }
+    //set all the settings and convert the types needed.
+    mbRtuSettings.device = this->config["MODBUS_RTU"]["DEVICE"];
+    mbRtuSettings.baud = this->config["MODBUS_RTU"]["BAUD"];
+    const std::string parityStr= this->config["MODBUS_RTU"]["PARITY"];
+    mbRtuSettings.parity = parityStr[0];
+    mbRtuSettings.dataBits = this->config["MODBUS_RTU"]["DATA_BITS"];
+    mbRtuSettings.regStart = this->config["MODBUS_RTU"]["REGSTART"];
+    mbRtuSettings.regEnd = this->config["MODBUS_RTU"]["REGEND"];
+    mbRtuSettings.TIMEOUT = this->config["MODBUS_RTU"]["TIMEOUT"];
 }
 
-//getters that return each object.
-json configManager::getModbusRtuConfig() {
-    return this->modbusRtuConf;
-}
-json configManager::getModbusTcpConfig() {
-    return this->modbusTcpConf;
-}
-json configManager::getMqttPubConfig() {
-    return this->mqttPubConf;
-}
-//private extract methods to load each attribute with its corresponding configdata
-void configManager::extract_modbusTCP(json &config) {
-    if(config.contains("MODBUS_TCP")){
-        this->modbusTcpConf = config["MODBUS_TCP"];
-    }
-    else {
-        throw std::runtime_error("Modbus TCP config not found");
-    }
-}
-void configManager::extract_modbusRTU(json &config) {
-    if (config.contains("MODBUS_RTU")) {
-        this->modbusRtuConf = config["MODBUS_RTU"];
-    }
-    else {
-throw std::runtime_error("Modbus RTU config not found");
-    }
-}
-void configManager::extract_mqttPub(json &config){
-    if (config.contains("MQTT_PUB")) {
-        this->mqttPubConf = config["MQTT_PUB"];
-    }
-    else {
-        throw std::runtime_error("MQTT PUB config not found");
-    }
-}
+
+
+
+

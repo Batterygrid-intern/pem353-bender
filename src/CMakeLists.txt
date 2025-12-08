@@ -17,21 +17,22 @@ add_library(mqttPub STATIC mqttPub.cpp)
 target_include_directories(mqttPub
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
 add_library(configManager STATIC configManager.cpp)
 target_include_directories(configManager
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
-#link json library
+
 target_link_libraries(configManager
     PUBLIC
         json
-        mqttPub
-        modbusTCP
-        modbusRTU
+        mbRtuSettings
+        mbTcpSettings
+        mqttPubSettings
 )
 
+add_subdirectory(include/dataclasses)
 #add executable for project program
-add_subdirectory(include)
 add_executable(${PROJECT_NAME} main.cpp)
 #link libraries for project executable
 target_link_libraries(${PROJECT_NAME}
