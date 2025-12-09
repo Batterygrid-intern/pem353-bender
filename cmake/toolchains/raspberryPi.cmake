@@ -1,8 +1,13 @@
-#CMAKE_SYSTEM_NAME is default set to the same value as the CMAKE_HOST_SYSTEM_NAME.
-#For CrossCompilation we need to explicitly tell which os we are targeting in this case Linux(Linux value * all linux distros
+# raspberryPi.cmake
 set(CMAKE_SYSTEM_NAME Linux)
-set(CMAKE_SYSTEM_PROCESSOR arm)
+set(CMAKE_SYSTEM_PROCESSOR aarch64)
 
-#Set the compilers for the targeted environments stored on my computer at..
-set(CMAKE_C_COMPILER )
-set(CMAKE_CXX_COMPILER )
+# Path to sysroot
+set(CMAKE_SYSROOT $ENV{HOME}/cross-compile/rpi4-sysroot)
+
+# Cross-compiler (installed on PC)
+set(CMAKE_C_COMPILER /usr/bin/aarch64-linux-gnu-gcc)
+set(CMAKE_CXX_COMPILER /usr/bin/aarch64-linux-gnu-g++)
+
+# Use PC's mak
+# DO NOT set CMAKE_MAKE_PROGRAM to anything inside the sysroot
