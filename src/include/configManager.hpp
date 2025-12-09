@@ -1,7 +1,7 @@
 #ifndef CONFIGMANAGER_HPP
 #define CONFIGMANAGER_HPP
 
-#include <nlohmann/json.hpp>
+#include <json.hpp>
 #include "mbRtuSettings.hpp"
 #include "mbTcpSettings.hpp"
 #include "mqttPubSettings.hpp"
