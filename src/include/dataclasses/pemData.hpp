@@ -4,6 +4,7 @@
 
 #ifndef PEM353_PEMDATA_HPP
 #define PEM353_PEMDATA_HPP
+#include <iostream>
 
 
 class pemData {
@@ -20,9 +21,22 @@ public:
     float activePowerTotal_W = 0.0;
     //System frequenzy (HERTZ) registers 0056-57
     float frequency_Hz = 0.0;
+
     pemData() = default;
 
     ~pemData() = default;
+    //just for testing
+    void printData() const{
+        std::cout << "pemData: " << std::endl;
+        std::cout << "voltageL1_V: " << voltageL1_V << std::endl;
+        std::cout << "voltageL2_V: " << voltageL2_V << std::endl;
+        std::cout << "voltageL3_V: " << voltageL3_V << std::endl;
+        std::cout << "currentL1_A: " << currentL1_A << std::endl;
+        std::cout << "currentL2_A: " << currentL2_A << std::endl;
+        std::cout << "currentL3_A: " << currentL3_A << std::endl;
+        std::cout << "activePowerTotal_W: " << activePowerTotal_W << std::endl;
+        std::cout << "frequency_Hz: " << frequency_Hz << std::endl;
+    }
 
 private:
 };

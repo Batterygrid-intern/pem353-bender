@@ -14,9 +14,27 @@ Implement a networking layer on a pem353-bender using a raspberryPi 4.
 ### rasppberry pi 4
  - 1GB RAM
  - 64bit OS Lite
- - 
+#### configs
+  raspi-config -> interfacing options -> serial -> disable loging shell -> enable serial port hardware -> reboot
+  /boot/firmware/config.txt -> add dtoverlay=disable-bt -> reboot
+  [guide](https://www.abelectronics.co.uk/kb/article/1035/serial-port-setup-in-raspberry-pi-os)
 ### raspberrypi rs-485 hat
-
+**[waveshare rs-485 hat.]**(https://www.waveshare.com/wiki/RS485_CAN_HAT)
+1. operating voltage 3.3v
+2. 485 transceiver: sp3485
+**SP3485** interface.
+  - half duplex communication
+  - RE logical low - recive mode
+  - DE logical high - transmit mode
+  - Så händer detta automatiskt:
+#### måste renskriva
+    Libmodbus skriver Modbus-begäran till /dev/ttyS0
+    Linux serial driver skickar data via TX-pinnen → till HAT → till PEM353
+    HAT växlar automatiskt SP3485 till transmit mode (hårdvara gör detta)
+    HAT växlar automatiskt tillbaka till receive mode
+    Linux serial driver läser svar via RX-pinnen ← från PEM353
+    Libmodbus tar emot datan och fyller din buffer
+    
 ## software
 software components that will be built or used in this project
 ### pem353-bender service that runs on the raspberrypi

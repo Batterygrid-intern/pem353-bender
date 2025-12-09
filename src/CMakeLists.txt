@@ -13,6 +13,12 @@ add_library(modbusTCP STATIC modbusTCP.cpp)
 target_include_directories(modbusTCP
         PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+target_link_libraries(modbusTCP
+        PUBLIC
+            PkgConfig::MODBUS
+            mbTcpSettings
+            configManager
+)
 #Build static library and include header for mqttPub
 add_library(mqttPub STATIC mqttPub.cpp)
 target_include_directories(mqttPub
