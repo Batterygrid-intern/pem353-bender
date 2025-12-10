@@ -17,6 +17,10 @@ kasta alla throws till huvud klassen
 men för information som är i min klass?
 implementera logger?
 
+# modbusRTU
+1. constructor now takes configmanager as argument maby dont want to do this 
+2. maby should initialise settings in main application class and keep the modbusRTU initialisation simple??
+
 
 # configManager
 

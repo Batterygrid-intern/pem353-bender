@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "loggerSettings.hpp"
+
 
 //constructor object reads json objects and stores data for each attribute in configManager
 
@@ -54,4 +56,11 @@ void configManager::loadMbRtuSettings(mbRtuSettings &mbRtuSettings) {
 void configManager::loadMbTcpSettings(mbTcpSettings &mbTcpSettings) {
     mbTcpSettings.HOST = this->config["MODBUS_TCP"]["HOST"];
     mbTcpSettings.PORT = this->config["MODBUS_TCP"]["PORT"];
+}
+void configManager::loadLoggerSettings(loggerSettings &loggerSettings) {
+    loggerSettings.filePath_ =this->config["LOGGER"]["PATH"];
+    loggerSettings.max_files_ = this->config["LOGGER"]["MAX_FILES"];
+    loggerSettings.hour_ = this->config["LOGGER"]["HOUR"];
+    loggerSettings.minute_ = this->config["LOGGER"]["MINUTE"];
+
 }

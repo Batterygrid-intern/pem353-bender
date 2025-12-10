@@ -18,3 +18,7 @@ add_library(mqttPubSettings INTERFACE)
 target_include_directories(mqttPubSettings
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
 )
+add_library(loggerSettings INTERFACE)
+target_include_directories(loggerSettings
+        INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
+)

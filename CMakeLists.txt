@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 #Project name
+project(pem353 LANGUAGES C CXX)
+
+find_package(spdlog REQUIRED)
 find_package(PkgConfig)
 pkg_check_modules(MODBUS REQUIRED IMPORTED_TARGET libmodbus)
-project(pem353 LANGUAGES C CXX)
 
 #Project target binary will be stored in ./bin
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
@@ -10,6 +12,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_MINIMUM_REQUIRED_VERSION ON)
+
+add_compile_options(-Wall -Wextra -Werror)
 #add subdirectory to nlohmann json library
 add_subdirectory(lib/nlohmann)
 #add subdirectories which will include all my classes and main loops used

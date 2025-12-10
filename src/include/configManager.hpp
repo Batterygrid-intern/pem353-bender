@@ -2,6 +2,8 @@
 #define CONFIGMANAGER_HPP
 
 #include <json.hpp>
+
+#include "loggerSettings.hpp"
 #include "mbRtuSettings.hpp"
 #include "mbTcpSettings.hpp"
 #include "mqttPubSettings.hpp"
@@ -23,6 +25,8 @@ public:
     void loadMbRtuSettings(mbRtuSettings &mbRtuSettings);
     void loadMqttSettings(mqttPubSettings& mqttPubSettings);
     void loadMbTcpSettings(mbTcpSettings &mbTcpSettings);
+    void loadLoggerSettings(loggerSettings &loggerSettings);
+
 };
 
 

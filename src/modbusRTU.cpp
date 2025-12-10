@@ -1,10 +1,10 @@
 #include "modbusRTU.hpp"
-
+//"NOTE maby dont want to load settings here. maby in main application
 //constructor will be take config object as argument and load all the needed settings from the settings class.
-modbusRTU::modbusRTU(configManager &configs) : settings() {
+modbusRTU::modbusRTU(std::unique_ptr<configManager> const &configs) : settings() {
     //Load all settings into modbusRTU object if fails throw exception to main loop
     try {
-        configs.loadMbRtuSettings(this->settings);
+        configs->loadMbRtuSettings(this->settings);
     } catch (std::exception &e) {
         throw std::runtime_error(e.what());
     }
@@ -22,8 +22,10 @@ modbusRTU::modbusRTU(configManager &configs) : settings() {
 
 //when destructor called, close open connection and free all memory allocated
 modbusRTU::~modbusRTU() {
-    modbus_close(this->ctx);
-    modbus_free(this->ctx);
+    if (this->ctx != nullptr) {
+        modbus_close(this->ctx);
+        modbus_free(this->ctx);
+    }
     delete[] this->buffer;
 }
 
@@ -34,13 +36,12 @@ void modbusRTU::connect() const {
     }
 
     //check if needed might not need might be controlled and mapped to the tx rx pins on the hat.
-   /* if (modbus_rtu_set_serial_mode(this->ctx,MODBUS_RTU_RS485) == -1) {
-        throw std::runtime_error("Failed to set serial mode");
-    }*/
+    /* if (modbus_rtu_set_serial_mode(this->ctx,MODBUS_RTU_RS485) == -1) {
+         throw std::runtime_error("Failed to set serial mode");
+     }*/
     /*if (modbus_rtu_set_rts(this->ctx,MODBUS_RTU_RTS_UP) == -1) {
         throw std::runtime_error("Failed to set rts");
     }*/
-
 }
 
 //read the modbus registers and store them in buffer.
@@ -91,7 +92,5 @@ void modbusRTU::updatePemData(pemData &data) {
                 //ignore the addresses that we dont want to store data from.
                 continue;
         }
-
     }
-
 }

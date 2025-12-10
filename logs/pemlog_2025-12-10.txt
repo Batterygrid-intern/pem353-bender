@@ -1,0 +1,2 @@
+[2025-12-10 13:37:57.983] [daily_logger] [info] modbus setup succesfully
+[2025-12-10 13:37:57.983] [daily_logger] [critical] critical failure: Failed to connect to modbus server

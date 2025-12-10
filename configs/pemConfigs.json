@@ -19,7 +19,10 @@
     "PORT": 1883
   },
   "LOGGER": {
-    "PATH": "./logs/pemlog.txt"
+    "PATH": "./logs/pemlog.txt",
+    "HOUR": 23,
+    "MINUTE": 59,
+    "MAX_FILES": 20
   }
 
 }

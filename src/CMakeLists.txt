@@ -36,6 +36,21 @@ target_link_libraries(configManager
         mbRtuSettings
         mbTcpSettings
         mqttPubSettings
+		loggerSettings
+)
+
+add_library(application STATIC application.cpp)
+target_include_directories(application
+		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+target_link_libraries(application
+		PUBLIC
+		spdlog::spdlog
+		modbusTCP
+		modbusRTU
+		mqttPub
+		pemData
+		configManager
 )
 
 add_subdirectory(include/dataclasses)
@@ -44,9 +59,5 @@ add_executable(${PROJECT_NAME} main.cpp)
 #link libraries for project executable
 target_link_libraries(${PROJECT_NAME}
         PUBLIC
-            modbusTCP
-            modbusRTU
-            mqttPub
-            pemData
-            configManager
+		application
 )
