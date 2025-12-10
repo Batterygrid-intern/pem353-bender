@@ -15,7 +15,8 @@ int main() {
     //Run main loop while modbusRtu runs without critical errors
     while (app.modbusRtuRun() != -1) {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
+        //print data for test purpose
+        app.pemData_.printData();
         //@modbusTCP, update modbusTCP registers
 
         //@MQTT publish to broker

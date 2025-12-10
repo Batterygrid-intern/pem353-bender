@@ -56,6 +56,8 @@ void configManager::loadMbRtuSettings(mbRtuSettings &mbRtuSettings) {
 void configManager::loadMbTcpSettings(mbTcpSettings &mbTcpSettings) {
     mbTcpSettings.HOST = this->config["MODBUS_TCP"]["HOST"];
     mbTcpSettings.PORT = this->config["MODBUS_TCP"]["PORT"];
+    mbTcpSettings.NB_REGISTERS = this->config["MODBUS_TCP"]["NB_REGISTER"];
+    mbTcpSettings.NB_CONNS = this->config["MODBUS_TCP"]["NB_CONNS"];
 }
 void configManager::loadLoggerSettings(loggerSettings &loggerSettings) {
     loggerSettings.filePath_ =this->config["LOGGER"]["PATH"];

@@ -6,8 +6,11 @@
 
 class mbTcpSettings {
 public:
+   std::string HOST;
    int PORT = 0;
-   std::string HOST = "";
+   int NB_CONNS = 0;
+   int NB_REGISTERS = 0;
+
    mbTcpSettings();
 private:
 
