@@ -41,35 +41,59 @@ void modbusTCP::stop() {
     }
 }
 
+//listen for connection
+void modbusTCP::listen() {
+    //creates a server_socket_ with maximum of 10 connections in que
+    server_socket_ = modbus_tcp_listen(ctx_, settings_.NB_CONNS);
+    if (server_socket_ == -1) {
+        throw std::runtime_error("modbusTCP: unable to listen: " + std::string(modbus_strerror(errno)));
+    }
+}
+//setup Set of FD
+void modbusTCP::setupFdSets() {
+    fdmax_ = server_socket_;
+    //@FD_ZERO clean up current master_set_ of sockets
+    //@FD_SET adds server_socket_ socket to master_set
+    FD_ZERO(&master_set_);
+    FD_SET(server_socket_, &master_set_);
+}
+
+//wait for activity on any of the sockets
+bool modbusTCP::waitForActivity() {
+    /* select() blocks until at least one file descriptor in read_set_ is ready to read.
+    When it returns, read_set_ contains only the descriptors that are ready. */
+    //@read_set_ = master_set_ select will destroy the fdset of filedescriptor we pass to it so we copy to temporary so that
+    //We keep the structure of the other file_descriptors in master_set_
+    read_set_ = master_set_;
+    if (select(fd_max_ + 1, &read_set_, NULL, NULL, NULL) == -1) {
+        if (!running_) {
+            return false;
+        }
+        throw std::runtime_error("modbusTCP: select error: " + std::string(strerror(errno)));
+    }
+    return true;
+}
+
 //multiclient server loop.
 void modbusTCP::run() {
     //listen for connection on created socket
     listen();
-    //create master_set (controls the initial file descriptor?
-    fd_set master_set;
-    fd_set read_set;
-    FD_ZERO(&master_set);
-    FD_SET(server_socket_, &master_set);
-    //holds the largest file descriptor number
-    int fdmax = server_socket_;
+
+    //setup Fd SETS
+    setupFdSets();
 
     while (running_) {
-        //copy master_set;(original to read_set which will be modifed.
-        //reads_set keeps control on file descritpors.??
-        read_set = master_set;
 
-        if (select(fdmax + 1, &read_set, NULL, NULL, NULL) == -1) {
-            if (!running_) break;
-            throw std::runtime_error("modbusTCP: select error: " + std::string(strerror(errno)));
+        if (!waitForActivity()) {
             continue;
         }
 
-        for (int s = 0; s < fdmax; s++) {
-            if (!FD_ISSET(s, &read_set)) {
+        for ( socket_ = 0; socket_ < fdmax; socket_++) {
+            if (!FD_ISSET(socket_, &read_set_)) {
                 continue;
             }
             //new client connection
-            if (s == server_socket_) {
+            if (socket_ == server_socket_) {
                 sockaddr_in clientaddr{};
                 socklen_t addr_len = sizeof(clientaddr);
                 int newfd = accept(server_socket_, reinterpret_cast<sockaddr *>(&clientaddr), &addr_len);
@@ -77,40 +101,32 @@ void modbusTCP::run() {
                     throw std::runtime_error("modbusTCP: accept error: " + std::string(strerror(errno)));
                     continue;
                 }
-                FD_SET(newfd, &read_set);
+                FD_SET(newfd, &read_set_);
                 if (newfd > fdmax) {
                     fdmax = newfd;
                 }
                 std::cout << "New client connected: socket " << newfd << std::endl;
             } else {
                 modbus_set_socket(ctx_, s);
-                uint8_t query[MODBUS_TCP_MAX_ADU_LENGHT];
+                uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
                 int rc = modbus_receive(ctx_, query);
                 if (rc > 0) {
                     modbus_reply(ctx_, query, rc, mb_mapping_);
                 } else {
                     std::cout << "Client disconnected: socket " << s << "\n";
                     close(s);
-                    FD_CLR(s, &master_set);
+                    FD_CLR(socket_, &master_set_);
                 }
-            }
         }
     }
     for (int s = 0; s <= fdmax; s++) {
-        if (FD_ISSET(s, &master_set)) {
+        if (FD_ISSET(s, &master_set_)) {
             close(s);
         }
     }
 }
 
 
-//listen for connection
-void modbusTCP::listen() {
-    server_socket_ = modbus_tcp_listen(ctx_, settings_.NB_CONNS);
-    if (server_socket_ == -1) {
-        throw std::runtime_error("modbusTCP: unable to listen: " + std::string(modbus_strerror(errno)));
-    }
-}
 
 
 //Destructor that frees upp memory of modbus struct ptrs
