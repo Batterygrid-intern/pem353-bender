@@ -51,6 +51,7 @@ target_link_libraries(application
 		mqttPub
 		pemData
 		configManager
+		mbTcpSettings
 )
 
 add_subdirectory(include/dataclasses)

@@ -4,6 +4,9 @@
 #include <sys/select.h>
 #include <arpa/inet.h>
 #include <iostream>
+#include <algorithm>
+#include <cstring>
+
 
 //constructor initializes settings
 modbusTCP::modbusTCP(const mbTcpSettings &settings) : settings_(settings) {
@@ -41,6 +44,48 @@ void modbusTCP::stop() {
     }
 }
 
+
+std::vector<uint16_t> modbusTCP::float_to_regs(const std::vector<float> &fdata) {
+    std::vector<uint16_t> regs;
+    regs.reserve(fdata.size()*2);
+
+    for (float f : fdata) {
+        static_assert(sizeof(float) == 4, "float must be 32-bit");
+        std::uint32_t u32 = 0;
+        std::memcpy(&u32, &f, sizeof(u32));
+
+        std::uint16_t hi = static_cast<std::uint16_t>(u32 >> 16);
+        std::uint16_t lo = static_cast<std::uint16_t>(u32 & 0xffff);
+        if (settings_.BIG_ENDI) {
+            regs.push_back(hi);
+            regs.push_back(lo);
+        }
+        else {
+            regs.push_back(lo);
+            regs.push_back(hi);
+        }
+    }
+    return regs;
+}
+
+bool modbusTCP::write_floats_to_holding_registers(int startAddr, const std::vector<float> &fdata) {
+    if (startAddr < 0) return false;
+    if (mb_mapping_ == nullptr || mb_mapping_ ->tab_registers == nullptr) return false;
+
+    const auto regs = float_to_regs(fdata);
+    const int needed = static_cast<int>(regs.size());
+    const int endAddrExclusive = startAddr + needed;
+
+    if (endAddrExclusive > mb_mapping_->nb_registers) return false;
+
+    std::lock_guard<std::mutex> lock(mapping_mutex_);
+    std::copy(regs.begin(), regs.end(), mb_mapping_->tab_registers + startAddr);
+    return true;
+
+
+}
+
+
 //listen for connection
 void modbusTCP::listen() {
     //creates a server_socket_ with maximum of 10 connections in que
@@ -51,7 +96,7 @@ void modbusTCP::listen() {
 }
 //setup Set of FD
 void modbusTCP::setupFdSets() {
-    fdmax_ = server_socket_;
+    fd_max_ = server_socket_;
     //@FD_ZERO clean up current master_set_ of sockets
     //@FD_SET adds server_socket_ socket to master_set
     FD_ZERO(&master_set_);
@@ -74,6 +119,37 @@ bool modbusTCP::waitForActivity() {
     return true;
 }
 
+bool modbusTCP::acceptConnection() {
+    sockaddr_in clientaddr{};
+    socklen_t addr_len = sizeof(clientaddr);
+    int newfd = accept(server_socket_, reinterpret_cast<sockaddr *>(&clientaddr), &addr_len);
+    if (newfd == -1) {
+        throw std::runtime_error("modbusTCP: accept error: " + std::string(strerror(errno)));
+    }
+    FD_SET(newfd, &master_set_);
+    if (newfd > fd_max_) {
+        fd_max_ = newfd;
+    }
+    std::cout << "New client connected: socket " << newfd << std::endl;
+    return true;
+}
+
+
+void modbusTCP::replyQuery() {
+    modbus_set_socket(ctx_, socket_);
+    uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
+    int rc = modbus_receive(ctx_, query);
+    if (rc > 0) {
+        std::lock_guard<std::mutex> lock(mapping_mutex_);
+        modbus_reply(ctx_, query, rc, mb_mapping_);
+    } else {
+        std::cout << "Client disconnected: socket " << socket_<< "\n";
+        close(socket_);
+        FD_CLR(socket_, &master_set_);
+    }
+}
+
+
 //multiclient server loop.
 void modbusTCP::run() {
     //listen for connection on created socket
@@ -83,45 +159,30 @@ void modbusTCP::run() {
     setupFdSets();
 
     while (running_) {
-
+        //block thread until activ connection querys information
         if (!waitForActivity()) {
             continue;
         }
-
-        for ( socket_ = 0; socket_ < fdmax; socket_++) {
+        //loop over the possible sockets and pick socket to perfom action on.
+        for ( socket_ = 0; socket_ <= fd_max_; socket_++) {
             if (!FD_ISSET(socket_, &read_set_)) {
                 continue;
             }
             //new client connection
             if (socket_ == server_socket_) {
-                sockaddr_in clientaddr{};
-                socklen_t addr_len = sizeof(clientaddr);
-                int newfd = accept(server_socket_, reinterpret_cast<sockaddr *>(&clientaddr), &addr_len);
-                if (newfd == -1) {
-                    throw std::runtime_error("modbusTCP: accept error: " + std::string(strerror(errno)));
-                    continue;
-                }
-                FD_SET(newfd, &read_set_);
-                if (newfd > fdmax) {
-                    fdmax = newfd;
-                }
-                std::cout << "New client connected: socket " << newfd << std::endl;
+              if (!acceptConnection()) {
+                  continue;
+              }
             } else {
-                modbus_set_socket(ctx_, s);
-                uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
-                int rc = modbus_receive(ctx_, query);
-                if (rc > 0) {
-                    modbus_reply(ctx_, query, rc, mb_mapping_);
-                } else {
-                    std::cout << "Client disconnected: socket " << s << "\n";
-                    close(s);
-                    FD_CLR(socket_, &master_set_);
-                }
+                //reply to modbus query
+                replyQuery();
+            }
         }
     }
-    for (int s = 0; s <= fdmax; s++) {
-        if (FD_ISSET(s, &master_set_)) {
-            close(s);
+    //close socket after queries complete
+    for (socket_ = 0; socket_ <= fd_max_; socket_++) {
+        if (FD_ISSET(socket_, &master_set_)) {
+            close(socket_);
         }
     }
 }

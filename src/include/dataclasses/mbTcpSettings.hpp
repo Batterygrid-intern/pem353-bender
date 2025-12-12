@@ -10,8 +10,9 @@ public:
    int PORT = 0;
    int NB_CONNS = 0;
    int NB_REGISTERS = 0;
+   int BIG_ENDI = 0;
 
-   mbTcpSettings();
+   mbTcpSettings() = default;
 private:
 
 };

@@ -1,4 +1,6 @@
 #include "modbusRTU.hpp"
+
+#include <thread>
 //"NOTE maby dont want to load settings here. maby in main application
 //constructor will be take config object as argument and load all the needed settings from the settings class.
 modbusRTU::modbusRTU(std::unique_ptr<configManager> const &configs) : settings() {
@@ -65,32 +67,33 @@ void modbusRTU::updatePemData(pemData &data) {
         int registerAddr = settings.REGSTART + i;
         switch (registerAddr) {
             case 0:
-                data.voltageL1_V = modbus_get_float_abcd(&this->buffer[i]);
+                data.voltageL1_V_ = modbus_get_float_abcd(&this->buffer[i]);
                 break;
             case 2:
-                data.voltageL2_V = modbus_get_float_abcd(&this->buffer[i]);
+                data.voltageL2_V_ = modbus_get_float_abcd(&this->buffer[i]);
                 break;
             case 4:
-                data.voltageL3_V = modbus_get_float_abcd(&this->buffer[i]);
+                data.voltageL3_V_ = modbus_get_float_abcd(&this->buffer[i]);
                 break;
             case 16:
-                data.currentL1_A = modbus_get_float_abcd(&this->buffer[i]);
+                data.currentL1_A_ = modbus_get_float_abcd(&this->buffer[i]);
                 break;
             case 18:
-                data.currentL2_A = modbus_get_float_abcd(&this->buffer[i]);
+                data.currentL2_A_ = modbus_get_float_abcd(&this->buffer[i]);
                 break;
             case 20:
-                data.currentL3_A = modbus_get_float_abcd(&this->buffer[i]);
+                data.currentL3_A_ = modbus_get_float_abcd(&this->buffer[i]);
                 break;
             case 30:
-                data.activePowerTotal_W = modbus_get_float_abcd(&this->buffer[i]);
+                data.activePowerTotal_W_ = modbus_get_float_abcd(&this->buffer[i]);
                 break;
             case 56:
-                data.frequency_Hz = modbus_get_float_abcd(&this->buffer[i]);
+                data.frequency_Hz_ = modbus_get_float_abcd(&this->buffer[i]);
                 break;
             default:
                 //ignore the addresses that we dont want to store data from.
                 continue;
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(this->settings.TIMEOUT));
     }
 }

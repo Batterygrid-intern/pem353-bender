@@ -20,6 +20,32 @@ application::application(const std::string &configFilePath) : configFilePath_(co
 }
 //try to set upp the modbusRTU context needed for serial communication
 //if it fails logg and return -1
+
+int application::modbusTcpSetup() {
+    try {
+        config_->loadMbTcpSettings(tcpSettings_);
+        modbusTcp_ = std::make_unique<modbusTCP>(tcpSettings_);
+        modbusTcp_->start();
+        return 0;
+
+    }catch (std::exception &e) {
+        logger_->critical("critical failure: {}", e.what());
+        return -1;
+    }
+}
+
+int application::modbusTcpWriteRegs() {
+    try {
+        modbusTcp_->write_floats_to_holding_registers(0, pemData_.pemDataToVector());
+        logger_->info("modbus write registers successfully");
+        return 0;
+    }catch (std::exception &e) {
+        logger_->critical("critical failure: {}", e.what());
+        return -1;
+    }
+}
+
+
 int application::modbusRtuSetup() {
     try {
         modbusRtu_ = std::make_unique<modbusRTU>(config_);
@@ -46,3 +72,5 @@ int application::modbusRtuRun() {
     }
     return 0;
 }
+
+

@@ -6,12 +6,16 @@
 #include "configManager.hpp"
 #include "pemData.hpp"
 #include "modbusRTU.hpp"
+#include "modbusTCP.hpp"
+#include "mbTcpSettings.hpp"
 
 class application {
 public:
+    mbTcpSettings tcpSettings_;
     std::string configFilePath_;
     std::unique_ptr<configManager> config_;
     std::unique_ptr<modbusRTU> modbusRtu_;
+    std::unique_ptr<modbusTCP> modbusTcp_;
     std::shared_ptr<spdlog::logger> logger_;
     pemData pemData_;
 
@@ -20,8 +24,11 @@ public:
     ~application() = default;
 
 
+    //modbusTCP
+    int modbusTcpSetup();
+    int modbusTcpWriteRegs();
+    //modbusRTU
     int modbusRtuSetup();
-
     int modbusRtuRun();
 
 private:
