@@ -27,6 +27,7 @@ target_include_directories(mqttPub
 target_link_libraries(mqttPub
 	PUBLIC
 		PahoMqttCpp::paho-mqttpp3
+		mqttPubSettings
 )
 
 add_library(configManager STATIC configManager.cpp)

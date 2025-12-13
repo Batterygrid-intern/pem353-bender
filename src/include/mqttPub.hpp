@@ -16,10 +16,12 @@
 class callback: public virtual mqtt::callback {
 public:
     void connection_lost(const std::string& cause) override {
-        std::cout << "Connection lost:: " << cause << std::endl;
+       if (!cause.empty()) {
+           std::cout << "Cause: " << cause << std::endl;
+       }
     }
-    void delivery_complete(mqtt::delivery_token_ptr token) override {
-        std::cout << "Message delivered\n";
+    void delivery_complete(mqtt::delivery_token_ptr tok) override {
+        std::cout << "Delivery complete for toke: " << (tok ? tok->get_message_id() : -1) << std::endl;
     }
 };
 
@@ -34,7 +36,7 @@ protected:
 };
 
 class delivery_action_listener : public action_listener {
-    atomic<bool> done_;
+    std::atomic<bool> done_;
     void on_failure(const mqtt::token &tok)override {
         action_listener::on_failure(tok);
         done_ = true;
