@@ -32,7 +32,7 @@ configManager::configManager(std::string &configFilePath) {
 
 //loads all configs read into settings class for modbusRTU
 void configManager::loadMbRtuSettings(mbRtuSettings &mbRtuSettings) {
-    //if json object doesnot contain HEADKEAY it will throw runtime error
+    //if json object does not contain HEADKEAY it will throw runtime error
     if (!this->config.contains("MODBUS_RTU")) {
         throw std::runtime_error("MODBUS_RTU settings not found in config file");
     }
@@ -54,6 +54,9 @@ void configManager::loadMbRtuSettings(mbRtuSettings &mbRtuSettings) {
 }
 
 void configManager::loadMbTcpSettings(mbTcpSettings &mbTcpSettings) {
+    if (!this->config.contains("MODBUS_TCP")) {
+        throw std::runtime_error("MODBUS_TCP settings not found in config file");
+    }
     mbTcpSettings.HOST = this->config["MODBUS_TCP"]["HOST"];
     mbTcpSettings.PORT = this->config["MODBUS_TCP"]["PORT"];
     mbTcpSettings.NB_REGISTERS = this->config["MODBUS_TCP"]["NB_REGISTER"];
@@ -61,9 +64,26 @@ void configManager::loadMbTcpSettings(mbTcpSettings &mbTcpSettings) {
     mbTcpSettings.BIG_ENDI = this->config["MODBUS_TCP"]["BIG_ENDIAN"];
 }
 void configManager::loadLoggerSettings(loggerSettings &loggerSettings) {
+    if (!this->config.contains("LOGGER")) {
+        throw std::runtime_error("LOGGER settings not found in config file");
+    }
     loggerSettings.filePath_ =this->config["LOGGER"]["PATH"];
     loggerSettings.max_files_ = this->config["LOGGER"]["MAX_FILES"];
     loggerSettings.hour_ = this->config["LOGGER"]["HOUR"];
     loggerSettings.minute_ = this->config["LOGGER"]["MINUTE"];
 
+}
+
+void configManager::loadMqttSettings(mqttPubSettings &mqttPubSettings) {
+    if (!this->config.contains("MQTT_PUB")) {
+        throw std::runtime_error("MQTT_PUB settings not found in config file");
+    }
+    mqttPubSettings.HOST = this->config["MQTT_PUB"]["HOST"];
+    mqttPubSettings.PORT = this->config["MQTT_PUB"]["PORT"];
+    mqttPubSettings.TOPIC = this->config["MQTT_PUB"]["TOPIC"];
+    mqttPubSettings.QOS = this->config["MQTT_PUB"]["QOS"];
+    mqttPubSettings.RETAIN = this->config["MQTT_PUB"]["RETAIN"];
+    mqttPubSettings.CLIENT_ID = this->config["MQTT_PUB"]["CLIENT_ID"];
+    mqttPubSettings.USERNAME = this->config["MQTT_PUB"]["USERNAME"];
+    mqttPubSettings.PASSWORD = this->config["MQTT_PUB"]["PASSWORD"];
 }

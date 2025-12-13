@@ -19,7 +19,10 @@
   },
   "MQTT_PUB": {
     "HOST": "192.168.1.100",
-    "PORT": 1883
+    "PORT": 1883,
+    "TOPIC": "pem/data",
+    "QOS": 1,
+    "RETAIN": 0
   },
   "LOGGER": {
     "PATH": "./logs/pemlog.txt",
@@ -27,5 +30,4 @@
     "MINUTE": 59,
     "MAX_FILES": 20
   }
-
 }

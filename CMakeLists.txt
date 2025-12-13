@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 #Project name
 project(pem353 LANGUAGES C CXX)
 
+find_package(PahoMqttCpp REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(PkgConfig)
 pkg_check_modules(MODBUS REQUIRED IMPORTED_TARGET libmodbus)
