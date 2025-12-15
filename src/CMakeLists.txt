@@ -20,15 +20,15 @@ target_link_libraries(modbusTCP
             configManager
 )
 #Build static library and include header for mqttPub
-add_library(mqttPub STATIC mqttPub.cpp)
-target_include_directories(mqttPub
-        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
-target_link_libraries(mqttPub
-	PUBLIC
-		PahoMqttCpp::paho-mqttpp3
-		mqttPubSettings
-)
+#add_library(mqttPub STATIC mqttPub.cpp)
+#target_include_directories(mqttPub
+#        PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+#)
+#target_link_libraries(mqttPub
+#PUBLIC
+#		PahoMqttCpp::paho-mqttpp3
+#		mqttPubSettings
+#)
 
 add_library(configManager STATIC configManager.cpp)
 target_include_directories(configManager
@@ -57,6 +57,7 @@ target_link_libraries(application
 		pemData
 		configManager
 		mbTcpSettings
+		mqttPubSettings
 )
 
 add_subdirectory(include/dataclasses)

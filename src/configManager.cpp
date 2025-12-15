@@ -78,8 +78,7 @@ void configManager::loadMqttSettings(mqttPubSettings &mqttPubSettings) {
     if (!this->config.contains("MQTT_PUB")) {
         throw std::runtime_error("MQTT_PUB settings not found in config file");
     }
-    mqttPubSettings.HOST = this->config["MQTT_PUB"]["HOST"];
-    mqttPubSettings.PORT = this->config["MQTT_PUB"]["PORT"];
+    mqttPubSettings.URI = this->config["MQTT_PUB"]["URI"];
     mqttPubSettings.TOPIC = this->config["MQTT_PUB"]["TOPIC"];
     mqttPubSettings.QOS = this->config["MQTT_PUB"]["QOS"];
     mqttPubSettings.RETAIN = this->config["MQTT_PUB"]["RETAIN"];

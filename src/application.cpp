@@ -20,6 +20,20 @@ application::application(const std::string &configFilePath) : configFilePath_(co
 }
 //try to set upp the modbusRTU context needed for serial communication
 //if it fails logg and return -1
+void application::mqttPubSetup() {
+    config_->loadMqttSettings(mqttSettings_);
+    mqttPub_ = std::make_unique<mqttPub>(mqttSettings_);
+}
+void application::mqttConnect() {
+    mqttPub_->connect();
+}
+int application::mqttPublish() {
+    if (mqttPub_->message() == -1) {
+       return -1;
+    }
+    return 0;
+}
+
 
 int application::modbusTcpSetup() {
     try {
@@ -59,9 +73,9 @@ int application::modbusTcpWriteRegs() {
 int application::modbusRtuSetup() {
     try {
         modbusRtu_ = std::make_unique<modbusRTU>(config_);
-        logger_->info("modbus setup succesfully");
+        logger_->info("modbusRTU setup succesfully");
         modbusRtu_->connect();
-        logger_->info("modbus connected");
+        logger_->info("modbus connected to serial port");
     } catch (std::exception &e) {
         logger_->critical("critical failure: failed to setup modbusRTUconnection {}", e.what());
         std::cerr << "Critical failure: !" << e.what() << std::endl;
@@ -83,5 +97,6 @@ int application::modbusRtuRun() {
     }
     return 0;
 }
+
 
 

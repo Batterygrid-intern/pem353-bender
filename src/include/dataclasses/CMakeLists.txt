@@ -22,3 +22,13 @@ add_library(loggerSettings INTERFACE)
 target_include_directories(loggerSettings
         INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+add_library(mqttPub INTERFACE)
+target_include_directories(mqttPub
+        INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
+)
+target_link_libraries(mqttPub
+    INTERFACE
+        PahoMqttCpp::paho-mqttpp3
+        mqttPubSettings
+)

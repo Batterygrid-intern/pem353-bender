@@ -11,18 +11,21 @@
     "TIMEOUT": 50
   },
   "MODBUS_TCP": {
-    "HOST": "192.168.1.100",
+    "HOST": "192.168.1.162",
     "PORT": 502,
     "NB_CONN": 10,
     "NB_REGS": 20,
     "BIG_ENDIAN": 1
   },
   "MQTT_PUB": {
-    "HOST": "192.168.1.100",
-    "PORT": 1883,
+    "URI": "ssl://192.168.1.110:8883",
     "TOPIC": "pem/data",
     "QOS": 1,
-    "RETAIN": 0
+    "RETAIN": 0,
+    "CLIENT_ID": "pem_client",
+    "USERNAME": "pem_user",
+    "PASSWORD": "",
+    "PRESIST_DIR": "./mqtt_persist/"
   },
   "LOGGER": {
     "PATH": "./logs/pemlog.txt",
