@@ -25,14 +25,24 @@ int application::modbusTcpSetup() {
     try {
         config_->loadMbTcpSettings(tcpSettings_);
         modbusTcp_ = std::make_unique<modbusTCP>(tcpSettings_);
-        modbusTcp_->start();
         return 0;
 
     }catch (std::exception &e) {
-        logger_->critical("critical failure: {}", e.what());
+        logger_->critical("critical failure: modbusTcpSetup {}", e.what());
         return -1;
     }
 }
+int application::modbusTcpStart() {
+    try {
+        modbusTcp_->start();
+        logger_->info("modbus tcp server started");
+        return 0;
+    }catch (std::exception &e) {
+        logger_->critical("critical failure: modbus Start {}", e.what());
+        return -1;
+    }
+}
+
 
 int application::modbusTcpWriteRegs() {
     try {
@@ -40,7 +50,7 @@ int application::modbusTcpWriteRegs() {
         logger_->info("modbus write registers successfully");
         return 0;
     }catch (std::exception &e) {
-        logger_->critical("critical failure: {}", e.what());
+        logger_->critical("critical failure: Write modbus registers {}", e.what());
         return -1;
     }
 }
@@ -53,12 +63,13 @@ int application::modbusRtuSetup() {
         modbusRtu_->connect();
         logger_->info("modbus connected");
     } catch (std::exception &e) {
-        logger_->critical("critical failure: {}", e.what());
+        logger_->critical("critical failure: failed to setup modbusRTUconnection {}", e.what());
         std::cerr << "Critical failure: !" << e.what() << std::endl;
         return -1;
     }
     return 0;
 }
+
 //@modbusRtuRun reads registers and updates
 int application::modbusRtuRun() {
     try {
@@ -67,7 +78,7 @@ int application::modbusRtuRun() {
         modbusRtu_->updatePemData(pemData_);
         logger_->info("modbus update pem data successfully");
     } catch (std::exception &e) {
-        logger_->critical("critical failure: {}", e.what());
+        logger_->critical("critical failure: failed to read registers or update pemdata {}", e.what());
         return -1;
     }
     return 0;

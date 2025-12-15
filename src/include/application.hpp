@@ -26,6 +26,7 @@ public:
 
     //modbusTCP
     int modbusTcpSetup();
+    int modbusTcpStart();
     int modbusTcpWriteRegs();
     //modbusRTU
     int modbusRtuSetup();
