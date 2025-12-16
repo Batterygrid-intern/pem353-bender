@@ -5,7 +5,7 @@
     "PARITY": "N",
     "DATA_BITS": 8,
     "STOP_BITS": 1,
-    "SLAVE_ID": 1,
+    "SLAVE_ID": 100,
     "REGSTART": 0,
     "REGEND": 57,
     "TIMEOUT": 50

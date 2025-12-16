@@ -34,26 +34,24 @@ modbusRTU::~modbusRTU() {
 //establishes a modbus connection defined by the ctx object.
 void modbusRTU::connect() const {
     if (modbus_connect(this->ctx) == -1) {
-        throw std::runtime_error("Failed to connect to modbus server");
+        throw std::runtime_error(std::string("Failed to connect to modbus server") + modbus_strerror(errno));
     }
-
     //check if needed might not need might be controlled and mapped to the tx rx pins on the hat.
-    if (modbus_rtu_set_serial_mode(this->ctx,MODBUS_RTU_RS485) == -1) {
-        throw std::runtime_error("Failed to set serial mode");
-    }
-    if (modbus_rtu_set_rts(this->ctx,MODBUS_RTU_RTS_UP) == -1) {
+    /*if (modbus_rtu_set_serial_mode(this->ctx,MODBUS_RTU_RS485) == -1) {
+        throw std::runtime_error(std::string("Failed to set serial mode: ") + modbus_strerror(errno));
+    }*/
+    /*if (modbus_rtu_set_rts(this->ctx,MODBUS_RTU_RTS_UP) == -1) {
         throw std::runtime_error("Failed to set rts");
-    }
+    }*/
 }
 
 //read the modbus registers and store them in buffer.
 void modbusRTU::readRegisters() {
     // @modbus_set_slave set slave id for the modbus server to read from
-    // @modbus_read_registers reads register from -> to -> into.
-    if (modbus_set_slave(this->ctx, this->settings.SLAVEID == -1)) {
+    if (modbus_set_slave(this->ctx, this->settings.SLAVEID ) == -1) {
         throw std::runtime_error(std::string("failed to set modbus slave id: ") + modbus_strerror(errno));
     }
-
+    // @modbus_read_registers reads register from -> to -> into.
     int rc = modbus_read_registers(this->ctx, settings.REGSTART, settings.NBREGS, this->buffer);
     if (rc == -1) {
         throw std::runtime_error(std::string("failed to read modbus registers: ") + modbus_strerror(errno));
@@ -62,6 +60,7 @@ void modbusRTU::readRegisters() {
         throw std::runtime_error(
             "expected " + std::to_string(settings.NBREGS) + " registers got " + std::to_string(rc));
     }
+    std::this_thread::sleep_for(std::chrono::milliseconds(settings.TIMEOUT));
 }
 
 void modbusRTU::printbuffer() {
@@ -106,6 +105,5 @@ void modbusRTU::updatePemData(pemData &data) {
                 //ignore the addresses that we dont want to store data from.
                 continue;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(this->settings.TIMEOUT));
     }
 }
