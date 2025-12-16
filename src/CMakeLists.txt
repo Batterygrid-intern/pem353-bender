@@ -48,6 +48,17 @@ add_library(application STATIC application.cpp)
 target_include_directories(application
 		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+add_library(mqttPub STATIC mqttPub.cpp)
+target_include_directories(mqttPub
+		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+target_link_libraries(mqttPub
+		PUBLIC
+		PahoMqttCpp::paho-mqttpp3
+		mqttPubSettings
+)
+
 target_link_libraries(application
 		PUBLIC
 		spdlog::spdlog
@@ -59,7 +70,6 @@ target_link_libraries(application
 		mbTcpSettings
 		mqttPubSettings
 )
-
 add_subdirectory(include/dataclasses)
 #add executable for project program
 add_executable(${PROJECT_NAME} main.cpp)

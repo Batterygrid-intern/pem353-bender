@@ -38,24 +38,35 @@ void modbusRTU::connect() const {
     }
 
     //check if needed might not need might be controlled and mapped to the tx rx pins on the hat.
-    /* if (modbus_rtu_set_serial_mode(this->ctx,MODBUS_RTU_RS485) == -1) {
-         throw std::runtime_error("Failed to set serial mode");
-     }*/
-    /*if (modbus_rtu_set_rts(this->ctx,MODBUS_RTU_RTS_UP) == -1) {
+    if (modbus_rtu_set_serial_mode(this->ctx,MODBUS_RTU_RS485) == -1) {
+        throw std::runtime_error("Failed to set serial mode");
+    }
+    if (modbus_rtu_set_rts(this->ctx,MODBUS_RTU_RTS_UP) == -1) {
         throw std::runtime_error("Failed to set rts");
-    }*/
+    }
 }
 
 //read the modbus registers and store them in buffer.
 void modbusRTU::readRegisters() {
     // @modbus_set_slave set slave id for the modbus server to read from
     // @modbus_read_registers reads register from -> to -> into.
-    if (modbus_set_slave(this->ctx, this->settings.SLAVEID) == -1) {
-        throw std::runtime_error("Failed to set slave id");
+    if (modbus_set_slave(this->ctx, this->settings.SLAVEID == -1)) {
+        throw std::runtime_error(std::string("failed to set modbus slave id: ") + modbus_strerror(errno));
     }
 
-    if (modbus_read_registers(this->ctx, settings.REGSTART, settings.NBREGS, this->buffer) == -1) {
-        throw std::runtime_error("Failed to read registers");
+    int rc = modbus_read_registers(this->ctx, settings.REGSTART, settings.NBREGS, this->buffer);
+    if (rc == -1) {
+        throw std::runtime_error(std::string("failed to read modbus registers: ") + modbus_strerror(errno));
+    }
+    if (rc != settings.NBREGS) {
+        throw std::runtime_error(
+            "expected " + std::to_string(settings.NBREGS) + " registers got " + std::to_string(rc));
+    }
+}
+
+void modbusRTU::printbuffer() {
+    for (int i = 0; i < settings.NBREGS; i++) {
+        std::cout << buffer[i] << std::endl;
     }
 }
 
@@ -67,6 +78,7 @@ void modbusRTU::updatePemData(pemData &data) {
         int registerAddr = settings.REGSTART + i;
         switch (registerAddr) {
             case 0:
+
                 data.voltageL1_V_ = modbus_get_float_abcd(&this->buffer[i]);
                 break;
             case 2:

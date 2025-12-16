@@ -81,8 +81,11 @@ void configManager::loadMqttSettings(mqttPubSettings &mqttPubSettings) {
     mqttPubSettings.URI = this->config["MQTT_PUB"]["URI"];
     mqttPubSettings.TOPIC = this->config["MQTT_PUB"]["TOPIC"];
     mqttPubSettings.QOS = this->config["MQTT_PUB"]["QOS"];
-    mqttPubSettings.RETAIN = this->config["MQTT_PUB"]["RETAIN"];
     mqttPubSettings.CLIENT_ID = this->config["MQTT_PUB"]["CLIENT_ID"];
     mqttPubSettings.USERNAME = this->config["MQTT_PUB"]["USERNAME"];
     mqttPubSettings.PASSWORD = this->config["MQTT_PUB"]["PASSWORD"];
+    mqttPubSettings.CONN_TIMEOUT = this->config["MQTT_PUB"]["CONN_TIMEOUT"];
+    mqttPubSettings.PRESIST_DIR = this->config["MQTT_PUB"]["PERSIST_DIR"];
+    mqttPubSettings.SITE = this->config["MQTT_PUB"]["SITE"];
+    mqttPubSettings.RETAIN = this->config["MQTT_PUB"]["RETAIN"];
 }

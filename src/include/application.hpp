@@ -28,9 +28,9 @@ public:
     ~application() = default;
 
     //mqttPub
-    void mqttPubSetup();
-    void mqttConnect();
-    int mqttPublish();
+    int mqttPubSetup();
+    int mqttConnect();
+//    int mqttPublish();
 
     //modbusTCP
     int modbusTcpSetup();

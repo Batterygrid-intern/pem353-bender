@@ -26,6 +26,9 @@ public:
     //update pem data obje
     void updatePemData(pemData& data);
 
+
+    //for for testing
+    void printbuffer();
 };
 
 

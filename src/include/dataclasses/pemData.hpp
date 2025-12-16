@@ -10,17 +10,17 @@
 class pemData {
 public:
     //Phase voltage (V) registers 0000-0005
-    float voltageL1_V_ = 35.0;
-    float voltageL2_V_ = 76.0;
-    float voltageL3_V_ = 34.0;
+    float voltageL1_V_ = 0.0;
+    float voltageL2_V_ = 0.0;
+    float voltageL3_V_ = 0.0;
     //Phase current (Amphere) registers 0016-0021
-    float currentL1_A_ = 32.0;
-    float currentL2_A_ = 54.0;
-    float currentL3_A_ = 123.0;
+    float currentL1_A_ = 0.0;
+    float currentL2_A_ = 0.0;
+    float currentL3_A_ = 0.0;
     //Total power (watts) registers 0030-0031
-    float activePowerTotal_W_ = 1513.35;
+    float activePowerTotal_W_ = 0.0;
     //System frequenzy (HERTZ) registers 0056-57
-    float frequency_Hz_ = 54.0;
+    float frequency_Hz_ = 0.0;
 
     pemData() = default;
 

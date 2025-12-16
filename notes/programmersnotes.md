@@ -66,3 +66,12 @@ och kan logga allt som händer. då blir det att alla objekt initialiseras med l
 ### watchdog to monitor and manage the pem353-bender service
 
 ### deployment script
+
+
+
+# förbättringar
+
+## exceptions klass 
+kan bygga egna exceptions och göra olika saker beroende på vad som kastas
+## main loop & application
+lägg in hela main i ett try catch block logga allt som kastas loggar jag och skapar olika beteenden för vad jag vill göra.

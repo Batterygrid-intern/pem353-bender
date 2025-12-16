@@ -19,13 +19,15 @@
   },
   "MQTT_PUB": {
     "URI": "ssl://192.168.1.110:8883",
-    "TOPIC": "pem/data",
+    "TOPIC": "pem353",
+    "SITE": "bgs-local",
+    "CLIENT_ID": "pem_lager",
     "QOS": 1,
-    "RETAIN": 0,
-    "CLIENT_ID": "pem_client",
     "USERNAME": "pem_user",
     "PASSWORD": "",
-    "PRESIST_DIR": "./mqtt_persist/"
+    "PRESIST_DIR": "./mqtt_persist/",
+    "CONN_TIMEOUT": "5",
+    "RETAIN": 0
   },
   "LOGGER": {
     "PATH": "./logs/pemlog.txt",
