@@ -16,14 +16,11 @@ int main() {
     if (app.modbusTcpStart() == -1) {
         return EXIT_FAILURE;
     }
-
-
     //Run main loop while modbusRtu runs without critical errors
     while (app.modbusRtuRun() != -1) {
         //print data for test purpose
         app.pemData_.printData();
-        //load data to vector to make it accessibale for modbus regsiter transformation
-        //need to fix correct error handling
+        //write pemData to modbusTCP registers
         app.modbusTcpWriteRegs();
         //@MQTT publish to broker
     }
