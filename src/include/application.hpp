@@ -7,19 +7,15 @@
 #include "pemData.hpp"
 #include "modbusRTU.hpp"
 #include "modbusTCP.hpp"
-#include "mqttPub.hpp"
 #include "mbTcpSettings.hpp"
-#include "mqttPubSettings.hpp"
 
 class application {
 public:
     mbTcpSettings tcpSettings_;
-    mqttPubSettings mqttSettings_;
     std::string configFilePath_;
     std::unique_ptr<configManager> config_;
     std::unique_ptr<modbusRTU> modbusRtu_;
     std::unique_ptr<modbusTCP> modbusTcp_;
-    std::unique_ptr<mqttPub> mqttPub_;
     std::shared_ptr<spdlog::logger> logger_;
     pemData pemData_;
 

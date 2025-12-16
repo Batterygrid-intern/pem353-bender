@@ -19,39 +19,7 @@ application::application(const std::string &configFilePath) : configFilePath_(co
     );
 }
 
-//try to set upp the modbusRTU context needed for serial communication
-//if it fails logg and return -1
-int application::mqttPubSetup() {
-    try {
-        config_->loadMqttSettings(mqttSettings_);
-        mqttPub_ = std::make_unique<mqttPub>(mqttSettings_);
-        logger_->info("mqttPub setup succesfully");
-        return 0;
-    } catch (std::exception &e) {
-        logger_->critical("critical failure: mqttPubSetup {}", e.what());
-        return -1;
-    }
-}
-int application::mqttConnect() {
-    try {
-        mqttPub_->connect();
-        logger_->info("mqtt connected succesfully");
-        return 0;
-    }
-    catch (std::exception &e) {
-        logger_->critical("critical failure: mqttConnect {}", e.what());
-        return -1;
-    }
-}
-
-/*int application::mqttPublish() {
-
-    try {
-
-    }catch ()
-}*/
-
-
+//MODBUS TCP/IP METHODS
 int application::modbusTcpSetup() {
     try {
         config_->loadMbTcpSettings(tcpSettings_);
@@ -62,7 +30,6 @@ int application::modbusTcpSetup() {
         return -1;
     }
 }
-
 int application::modbusTcpStart() {
     try {
         modbusTcp_->start();
@@ -73,7 +40,6 @@ int application::modbusTcpStart() {
         return -1;
     }
 }
-
 int application::modbusTcpWriteRegs() {
     try {
         modbusTcp_->write_floats_to_holding_registers(0, pemData_.pemDataToVector());
@@ -85,7 +51,7 @@ int application::modbusTcpWriteRegs() {
     }
 }
 
-
+//MODBUS RTU methods
 int application::modbusRtuSetup() {
     try {
         modbusRtu_ = std::make_unique<modbusRTU>(config_);
@@ -99,7 +65,6 @@ int application::modbusRtuSetup() {
     }
     return 0;
 }
-
 //@modbusRtuRun reads registers and updates
 int application::modbusRtuRun() {
     try {

@@ -118,7 +118,6 @@ bool modbusTCP::waitForActivity() {
     }
     return true;
 }
-
 bool modbusTCP::acceptConnection() {
     sockaddr_in clientaddr{};
     socklen_t addr_len = sizeof(clientaddr);
@@ -133,8 +132,6 @@ bool modbusTCP::acceptConnection() {
     std::cout << "New client connected: socket " << newfd << std::endl;
     return true;
 }
-
-
 void modbusTCP::replyQuery() {
     modbus_set_socket(ctx_, socket_);
     uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
@@ -148,8 +145,6 @@ void modbusTCP::replyQuery() {
         FD_CLR(socket_, &master_set_);
     }
 }
-
-
 //multiclient server loop.
 void modbusTCP::run() {
     //listen for connection on created socket
@@ -186,10 +181,6 @@ void modbusTCP::run() {
         }
     }
 }
-
-
-
-
 //Destructor that frees upp memory of modbus struct ptrs
 //close serial port connection and free allocated memory for context ptrs
 modbusTCP::~modbusTCP() {
