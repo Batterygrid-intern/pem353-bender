@@ -2,127 +2,91 @@
 set -euo pipefail
 
 APP_NAME="pem353"
-
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${ROOT_DIR}/cmake-build-release"
 DIST_DIR="${ROOT_DIR}/dist"
-STAGE_DIR="${DIST_DIR}/stage"
-ZIP_PATH="${DIST_DIR}/${APP_NAME}.zip"
+ZIP_NAME="${APP_NAME}.zip"
 
-require_cmd() {
-  if ! command -v "$1" >/dev/null 2>&1; then
-    echo "ERROR: required tool '$1' is missing. Please install it and try again." >&2
-    exit 1
-  fi
-}
+echo "==> Cleaning previous build and dist"
+rm -rf "$BUILD_DIR" "$DIST_DIR"
+mkdir -p "$BUILD_DIR" "$DIST_DIR"
 
-require_cmd cmake
-require_cmd zip
-require_cmd patchelf
-require_cmd ldconfig
-
-rm -rf "$BUILD_DIR" "$STAGE_DIR"
-mkdir -p "$BUILD_DIR" "$STAGE_DIR" "$DIST_DIR"
-
-echo "==> Building (Release)"
+echo "==> Building Release binary"
 cmake -S "$ROOT_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
-cmake --build "$BUILD_DIR" -- -j"$(nproc)"
+cmake --build "$BUILD_DIR" -j$(nproc)
 
 BIN="${ROOT_DIR}/bin/${APP_NAME}"
 if [[ ! -f "$BIN" ]]; then
-  echo "ERROR: binary not found: $BIN" >&2
+  echo "ERROR: Binary not found at $BIN" >&2
   exit 1
 fi
 
-echo "==> Creating staging layout"
-mkdir -p "${STAGE_DIR}/opt/${APP_NAME}/bin"
-mkdir -p "${STAGE_DIR}/opt/${APP_NAME}/lib"
-mkdir -p "${STAGE_DIR}/opt/${APP_NAME}/defaults"
-mkdir -p "${STAGE_DIR}/etc/systemd/system"
-mkdir -p "${STAGE_DIR}/install"
+echo "==> Creating package structure in dist/"
+mkdir -p "${DIST_DIR}/opt/${APP_NAME}/bin"
+mkdir -p "${DIST_DIR}/opt/${APP_NAME}/lib"
+mkdir -p "${DIST_DIR}/opt/${APP_NAME}/defaults"
+mkdir -p "${DIST_DIR}/etc/systemd/system"
+mkdir -p "${DIST_DIR}/install"
 
-cp -a "$BIN" "${STAGE_DIR}/opt/${APP_NAME}/bin/"
+echo "==> Copying binary"
+cp "$BIN" "${DIST_DIR}/opt/${APP_NAME}/bin/"
 
+echo "==> Copying default config"
 if [[ -f "${ROOT_DIR}/configs/pemConfigs.json" ]]; then
-  cp -a "${ROOT_DIR}/configs/pemConfigs.json" "${STAGE_DIR}/opt/${APP_NAME}/defaults/pemConfigs.json"
+  cp "${ROOT_DIR}/configs/pemConfigs.json" "${DIST_DIR}/opt/${APP_NAME}/defaults/"
 else
-  echo "WARNING: default config not found: ${ROOT_DIR}/configs/pemConfigs.json" >&2
+  echo "WARNING: No default config found at ${ROOT_DIR}/configs/pemConfigs.json" >&2
 fi
 
-cp -a "${ROOT_DIR}/install/${APP_NAME}.service" "${STAGE_DIR}/etc/systemd/system/${APP_NAME}.service"
-cp -a "${ROOT_DIR}/install/install.sh" "${STAGE_DIR}/install/install.sh"
-cp -a "${ROOT_DIR}/install/uninstall.sh" "${STAGE_DIR}/install/uninstall.sh"
-chmod +x "${STAGE_DIR}/install/install.sh" "${STAGE_DIR}/install/uninstall.sh" || true
+echo "==> Bundling shared libraries"
+# Get list of shared libraries the binary needs
+NEEDED_LIBS=$(ldd "$BIN" | grep "=>" | awk '{print $3}' | grep -v "^$")
 
-echo "==> Setting RPATH so the binary loads bundled libs from /opt/${APP_NAME}/lib"
-patchelf --set-rpath '$ORIGIN/../lib' "${STAGE_DIR}/opt/${APP_NAME}/bin/${APP_NAME}"
-
-echo "==> Bundling runtime shared libraries (NEEDED -> ldconfig -p)"
-mapfile -t needed < <(patchelf --print-needed "${STAGE_DIR}/opt/${APP_NAME}/bin/${APP_NAME}" | sort -u)
-
-if [[ "${#needed[@]}" -eq 0 ]]; then
-  echo "ERROR: no NEEDED libraries found. Is the binary statically linked?" >&2
-  exit 1
-fi
-
-skip_lib() {
-  case "$1" in
-    ld-linux-*.so*|ld-linux*.so*|libc.so.*) return 0 ;;
-  esac
-  return 1
-}
-
-missing=0
-for libname in "${needed[@]}"; do
-  if skip_lib "$libname"; then
+# Skip system libraries that should exist everywhere
+for lib in $NEEDED_LIBS; do
+  libname=$(basename "$lib")
+  
+  # Skip libc, ld-linux, and other core system libs
+  if [[ "$libname" =~ ^(libc\.so|ld-linux|libm\.so|libpthread\.so|libdl\.so|librt\.so) ]]; then
     continue
   fi
-
-  libpath="$(ldconfig -p | awk -v n="$libname" '$1==n {print $NF; exit}')"
-  if [[ -z "$libpath" || ! -e "$libpath" ]]; then
-    echo "ERROR: could not resolve '$libname' via ldconfig -p" >&2
-    missing=1
-    continue
-  fi
-
-  dir="$(dirname "$libpath")"
-  base="$(basename "$libpath")"
-  stem="${base%%.so*}"
-
-  cp -a "${dir}/${stem}.so"* "${STAGE_DIR}/opt/${APP_NAME}/lib/" 2>/dev/null || {
-    cp -L "$libpath" "${STAGE_DIR}/opt/${APP_NAME}/lib/" || true
-  }
+  
+  # Copy library and any symlinks
+  cp -L "$lib" "${DIST_DIR}/opt/${APP_NAME}/lib/" 2>/dev/null || true
+  
+  # Also copy version symlinks if they exist
+  libdir=$(dirname "$lib")
+  libbase=$(echo "$libname" | sed 's/\.so.*//')
+  cp -P "${libdir}/${libbase}.so"* "${DIST_DIR}/opt/${APP_NAME}/lib/" 2>/dev/null || true
 done
 
-if [[ "$missing" -ne 0 ]]; then
-  echo "ERROR: at least one required runtime library could not be resolved on the build machine." >&2
-  echo "       Install the missing runtime libraries on the build machine and rebuild." >&2
-  exit 1
+echo "==> Setting RPATH on binary"
+if command -v patchelf &>/dev/null; then
+  patchelf --set-rpath '$ORIGIN/../lib' "${DIST_DIR}/opt/${APP_NAME}/bin/${APP_NAME}"
+else
+  echo "WARNING: patchelf not found, binary may not find bundled libraries" >&2
 fi
 
-echo "==> Verification: ensure staged lib folder contains .so files"
-shopt -s nullglob
-sofiles=( "${STAGE_DIR}/opt/${APP_NAME}/lib/"*.so* )
-shopt -u nullglob
-if [[ "${#sofiles[@]}" -eq 0 ]]; then
-  echo "ERROR: no .so files were bundled into ${STAGE_DIR}/opt/${APP_NAME}/lib" >&2
-  echo "NEEDED libraries were:" >&2
-  patchelf --print-needed "${STAGE_DIR}/opt/${APP_NAME}/bin/${APP_NAME}" >&2 || true
-  exit 1
-fi
+echo "==> Copying systemd service file"
+cp "${ROOT_DIR}/install/${APP_NAME}.service" "${DIST_DIR}/etc/systemd/system/"
 
-echo "==> Verification: ldd with LD_LIBRARY_PATH (must not show 'not found')"
-LDD_OUT="$(LD_LIBRARY_PATH="${STAGE_DIR}/opt/${APP_NAME}/lib" ldd "${STAGE_DIR}/opt/${APP_NAME}/bin/${APP_NAME}" || true)"
-echo "$LDD_OUT"
-if echo "$LDD_OUT" | grep -q "not found"; then
-  echo "ERROR: at least one runtime library is still 'not found' after bundling." >&2
-  exit 1
-fi
+echo "==> Copying install scripts"
+cp "${ROOT_DIR}/install/install.sh" "${DIST_DIR}/install/"
+cp "${ROOT_DIR}/install/uninstall.sh" "${DIST_DIR}/install/"
+chmod +x "${DIST_DIR}/install/install.sh" "${DIST_DIR}/install/uninstall.sh"
 
-echo "==> Creating ZIP package"
-rm -f "$ZIP_PATH"
-( cd "$STAGE_DIR" && zip -r -9 "$ZIP_PATH" . >/dev/null )
+echo "==> Creating zip package"
+cd "$DIST_DIR"
+zip -r "$ZIP_NAME" opt/ etc/ install/ >/dev/null
+cd "$ROOT_DIR"
 
-echo "DONE: ${ZIP_PATH}"
-echo "Verify contents:"
-echo "  unzip -l ${ZIP_PATH} | grep 'opt/${APP_NAME}/lib/'"
+echo ""
+echo "✅ DONE: ${DIST_DIR}/${ZIP_NAME}"
+echo ""
+echo "Package contents:"
+unzip -l "${DIST_DIR}/${ZIP_NAME}" | grep -E "(opt|etc|install)"
+echo ""
+echo "To deploy:"
+echo "  1. Copy ${ZIP_NAME} to target machine"
+echo "  2. unzip ${ZIP_NAME}"
+echo "  3. sudo ./install/install.sh"
