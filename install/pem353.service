@@ -6,6 +6,7 @@ After=network.target
 Type=simple
 User=pem353
 Group=pem353
+SupplementaryGroups=dialout
 
 WorkingDirectory=/
 ExecStart=/opt/pem353/bin/pem353
@@ -13,7 +14,6 @@ ExecStart=/opt/pem353/bin/pem353
 Restart=on-failure
 RestartSec=2
 
-# Se till att nya filer (loggar) blir grupp-läs/skriv
 UMask=0002
 
 AmbientCapabilities=CAP_NET_BIND_SERVICE
