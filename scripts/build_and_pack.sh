@@ -47,20 +47,26 @@ fi
 # Bundle shared libraries
 echo ""
 echo "[3/4] Bundling shared libraries..."
-NEEDED_LIBS=$(ldd "$BINARY_PATH" | grep '/usr/local/lib' | awk '{print $3}')
 
-if [[ -n "$NEEDED_LIBS" ]]; then
-  while IFS= read -r lib; do
-    if [[ -f "$lib" ]]; then
-      lib_dir=$(dirname "$lib")
-      lib_base=$(basename "$lib" | sed 's/\.so\..*//')
-      
-      # Copy all related .so files and symlinks
-      find "$lib_dir" -name "${lib_base}.so*" \( -type f -o -type l \) -exec cp -P {} "$DEPLOY_DIR/lib/" \;
-      echo "  ✓ $(basename "$lib")"
-    fi
-  done <<< "$NEEDED_LIBS"
-else
+# Extract libraries from /usr/local/lib and copy them
+LIB_COUNT=0
+ldd "$BINARY_PATH" | grep '/usr/local/lib' | awk '{print $3}' > /tmp/pem353_libs.txt
+
+while IFS= read -r lib; do
+  if [[ -n "$lib" && -f "$lib" ]]; then
+    lib_dir=$(dirname "$lib")
+    lib_base=$(basename "$lib" | sed 's/\.so\..*//')
+    
+    # Copy all related .so files and symlinks
+    find "$lib_dir" -name "${lib_base}.so*" \( -type f -o -type l \) -exec cp -P {} "$DEPLOY_DIR/lib/" \; 2>/dev/null
+    echo "  ✓ $(basename "$lib")"
+    LIB_COUNT=$((LIB_COUNT + 1))
+  fi
+done < /tmp/pem353_libs.txt
+
+rm -f /tmp/pem353_libs.txt
+
+if [[ $LIB_COUNT -eq 0 ]]; then
   echo "  ⚠ No libraries found in /usr/local/lib"
 fi
 
