@@ -2,91 +2,89 @@
 set -euo pipefail
 
 APP_NAME="pem353"
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 BUILD_DIR="${ROOT_DIR}/cmake-build-release"
-DIST_DIR="${ROOT_DIR}/dist"
-ZIP_NAME="${APP_NAME}.zip"
+DEPLOY_DIR="${ROOT_DIR}/deploy"
+BINARY_PATH="${ROOT_DIR}/bin/${APP_NAME}"
 
-echo "==> Cleaning previous build and dist"
-rm -rf "$BUILD_DIR" "$DIST_DIR"
-mkdir -p "$BUILD_DIR" "$DIST_DIR"
+echo "==========================================="
+echo "PEM353 Build and Package Script"
+echo "==========================================="
+echo ""
 
-echo "==> Building Release binary"
+# Clean and build
+echo "[1/4] Building Release binary..."
+rm -rf "$BUILD_DIR"
+mkdir -p "$BUILD_DIR"
 cmake -S "$ROOT_DIR" -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE=Release
 cmake --build "$BUILD_DIR" -j$(nproc)
 
-BIN="${ROOT_DIR}/bin/${APP_NAME}"
-if [[ ! -f "$BIN" ]]; then
-  echo "ERROR: Binary not found at $BIN" >&2
+if [[ ! -f "$BINARY_PATH" ]]; then
+  echo "ERROR: Binary not found at $BINARY_PATH" >&2
   exit 1
 fi
+echo "✓ Binary built: $BINARY_PATH"
 
-echo "==> Creating package structure in dist/"
-mkdir -p "${DIST_DIR}/opt/${APP_NAME}/bin"
-mkdir -p "${DIST_DIR}/opt/${APP_NAME}/lib"
-mkdir -p "${DIST_DIR}/opt/${APP_NAME}/defaults"
-mkdir -p "${DIST_DIR}/etc/systemd/system"
-mkdir -p "${DIST_DIR}/install"
+# Create deploy structure
+echo ""
+echo "[2/4] Creating deployment structure..."
+rm -rf "$DEPLOY_DIR"
+mkdir -p "$DEPLOY_DIR/bin"
+mkdir -p "$DEPLOY_DIR/lib"
 
-echo "==> Copying binary"
-cp "$BIN" "${DIST_DIR}/opt/${APP_NAME}/bin/"
+# Copy binary
+cp "$BINARY_PATH" "$DEPLOY_DIR/bin/"
+chmod +x "$DEPLOY_DIR/bin/${APP_NAME}"
 
-echo "==> Copying default config"
+# Copy config
 if [[ -f "${ROOT_DIR}/configs/pemConfigs.json" ]]; then
-  cp "${ROOT_DIR}/configs/pemConfigs.json" "${DIST_DIR}/opt/${APP_NAME}/defaults/"
+  cp "${ROOT_DIR}/configs/pemConfigs.json" "$DEPLOY_DIR/"
 else
-  echo "WARNING: No default config found at ${ROOT_DIR}/configs/pemConfigs.json" >&2
+  echo "WARNING: No default config found" >&2
 fi
 
-echo "==> Bundling shared libraries"
-# Get list of shared libraries the binary needs
-NEEDED_LIBS=$(ldd "$BIN" | grep "=>" | awk '{print $3}' | grep -v "^$")
-
-# Skip system libraries that should exist everywhere
-for lib in $NEEDED_LIBS; do
-  libname=$(basename "$lib")
-  
-  # Skip libc, ld-linux, and other core system libs
-  if [[ "$libname" =~ ^(libc\.so|ld-linux|libm\.so|libpthread\.so|libdl\.so|librt\.so) ]]; then
-    continue
+# Bundle shared libraries
+echo ""
+echo "[3/4] Bundling shared libraries..."
+ldd "$BINARY_PATH" | grep '/usr/local/lib' | awk '{print $3}' | while read -r lib; do
+  if [[ -f "$lib" ]]; then
+    lib_dir=$(dirname "$lib")
+    lib_base=$(basename "$lib" | sed 's/\.so\..*//')
+    
+    # Copy all related .so files and symlinks
+    find "$lib_dir" -name "${lib_base}.so*" \( -type f -o -type l \) -exec cp -P {} "$DEPLOY_DIR/lib/" \;
+    echo "  ✓ $(basename "$lib")"
   fi
-  
-  # Copy library and any symlinks
-  cp -L "$lib" "${DIST_DIR}/opt/${APP_NAME}/lib/" 2>/dev/null || true
-  
-  # Also copy version symlinks if they exist
-  libdir=$(dirname "$lib")
-  libbase=$(echo "$libname" | sed 's/\.so.*//')
-  cp -P "${libdir}/${libbase}.so"* "${DIST_DIR}/opt/${APP_NAME}/lib/" 2>/dev/null || true
 done
 
-echo "==> Setting RPATH on binary"
+# Set RPATH
 if command -v patchelf &>/dev/null; then
-  patchelf --set-rpath '$ORIGIN/../lib' "${DIST_DIR}/opt/${APP_NAME}/bin/${APP_NAME}"
-else
-  echo "WARNING: patchelf not found, binary may not find bundled libraries" >&2
+  patchelf --set-rpath '$ORIGIN/../lib:/usr/local/lib' "$DEPLOY_DIR/bin/${APP_NAME}"
 fi
 
-echo "==> Copying systemd service file"
-cp "${ROOT_DIR}/install/${APP_NAME}.service" "${DIST_DIR}/etc/systemd/system/"
+# Copy installation scripts
+cp "${ROOT_DIR}/install/${APP_NAME}.service" "$DEPLOY_DIR/"
+cp "${ROOT_DIR}/install/install.sh" "$DEPLOY_DIR/"
+cp "${ROOT_DIR}/install/uninstall.sh" "$DEPLOY_DIR/"
+chmod +x "$DEPLOY_DIR/install.sh" "$DEPLOY_DIR/uninstall.sh"
 
-echo "==> Copying install scripts"
-cp "${ROOT_DIR}/install/install.sh" "${DIST_DIR}/install/"
-cp "${ROOT_DIR}/install/uninstall.sh" "${DIST_DIR}/install/"
-chmod +x "${DIST_DIR}/install/install.sh" "${DIST_DIR}/install/uninstall.sh"
+# Create package
+echo ""
+echo "[4/4] Creating deployment package..."
+VERSION=$(date +%Y%m%d_%H%M%S)
+PACKAGE_NAME="${APP_NAME}-deploy-${VERSION}.zip"
 
-echo "==> Creating zip package"
-cd "$DIST_DIR"
-zip -r "$ZIP_NAME" opt/ etc/ install/ >/dev/null
 cd "$ROOT_DIR"
+zip -r "$PACKAGE_NAME" deploy/ >/dev/null
 
 echo ""
-echo "✅ DONE: ${DIST_DIR}/${ZIP_NAME}"
+echo "==========================================="
+echo "✓ Package created: $PACKAGE_NAME"
+echo "==========================================="
+echo "Size: $(du -h "$PACKAGE_NAME" | cut -f1)"
 echo ""
-echo "Package contents:"
-unzip -l "${DIST_DIR}/${ZIP_NAME}" | grep -E "(opt|etc|install)"
-echo ""
-echo "To deploy:"
-echo "  1. Copy ${ZIP_NAME} to target machine"
-echo "  2. unzip ${ZIP_NAME}"
-echo "  3. sudo ./install/install.sh"
+echo "Deploy instructions:"
+echo "  1. scp $PACKAGE_NAME user@target:/tmp/"
+echo "  2. unzip $PACKAGE_NAME && cd deploy"
+echo "  3. sudo bash install.sh"

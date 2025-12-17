@@ -7,31 +7,26 @@ Type=simple
 User=pem353
 Group=pem353
 SupplementaryGroups=dialout
+WorkingDirectory=/var/lib/pem353
+Environment="LD_LIBRARY_PATH=/opt/pem353/lib:/usr/local/lib"
+ExecStart=/usr/local/bin/pem353
+Restart=always
+RestartSec=10
 
-WorkingDirectory=/opt/pem353
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/pem353 /var/lib/pem353
 
-# Ensure log directory exists with correct permissions before starting
-ExecStartPre=/bin/mkdir -p /var/log/pem353
-ExecStartPre=/bin/chown pem353:pem353 /var/log/pem353
-ExecStartPre=/bin/chmod 755 /var/log/pem353
-
-ExecStart=/opt/pem353/bin/pem353
-
-Restart=on-failure
-RestartSec=5
-
-# Environment
-Environment=LD_LIBRARY_PATH=/opt/pem353/lib
-
-# Security: Allow binding to privileged port 502 without root
+# Allow binding to privileged ports (like 502 for Modbus)
 AmbientCapabilities=CAP_NET_BIND_SERVICE
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
-NoNewPrivileges=true
 
 # Logging
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=pem353
 
 [Install]
 WantedBy=multi-user.target
