@@ -47,6 +47,8 @@ private:
 
     void replyQuery();
 
+    void handle_Query();
+
 public:
     explicit modbusTCP(const mbTcpSettings &settings);
 

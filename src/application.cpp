@@ -4,7 +4,8 @@
 
 #include "application.hpp"
 
-
+//constructor for applications object that will be used to manage the running program and all different objects and
+//communication protocols used for the project
 application::application(const std::string &configFilePath) : configFilePath_(configFilePath) {
     //@config_ initialize config manager
     //@loggerSettings && logger_ get the logger settings and implement settings to the logger_
@@ -18,8 +19,8 @@ application::application(const std::string &configFilePath) : configFilePath_(co
                                       loggSettings.max_files_
     );
 }
-
 //MODBUS TCP/IP METHODS
+//initializes modbusTcp object that will handle the modbusTCP server and handle the Queries from clients.
 int application::modbusTcpSetup() {
     try {
         config_->loadMbTcpSettings(tcpSettings_);
@@ -30,6 +31,7 @@ int application::modbusTcpSetup() {
         return -1;
     }
 }
+//method to start the modbusTCP server(runs on its own thread
 int application::modbusTcpStart() {
     try {
         modbusTcp_->start();
@@ -40,6 +42,7 @@ int application::modbusTcpStart() {
         return -1;
     }
 }
+//method to update modbusTCP registers with collected data
 int application::modbusTcpWriteRegs() {
     try {
         modbusTcp_->write_floats_to_holding_registers(0, pemData_.pemDataToVector());
@@ -50,8 +53,8 @@ int application::modbusTcpWriteRegs() {
         return -1;
     }
 }
-
 //MODBUS RTU methods
+//instantiate the modbusRTU object that will configure the serial port and handle request and responses to modbusRTUserver
 int application::modbusRtuSetup() {
     try {
         modbusRtu_ = std::make_unique<modbusRTU>(config_);
@@ -69,9 +72,7 @@ int application::modbusRtuSetup() {
 int application::modbusRtuRun() {
     try {
         modbusRtu_->readRegisters();
-        logger_->info("modbus read registers successfully");
         modbusRtu_->updatePemData(pemData_);
-        logger_->info("modbus update pem data successfully");
     } catch (std::runtime_error &e) {
         logger_->critical("{}", e.what());
         return -1;

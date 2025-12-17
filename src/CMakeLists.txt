@@ -45,7 +45,6 @@ target_link_libraries(application
 		pemData
 		configManager
 		mbTcpSettings
-		mqttPubSettings
 )
 add_subdirectory(include/dataclasses)
 #add executable for project program

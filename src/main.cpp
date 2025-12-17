@@ -3,7 +3,7 @@
 
 int main() {
     // initialize application
-    std::string configFilePath = "configs/pemConfigs.json";
+    std::string configFilePath = "etc/pem353/configs/pemConfigs.json";
     application app(configFilePath);
     //setup modbusRTU context for port and connect to port
     if (app.modbusRtuSetup() == -1) {
@@ -17,14 +17,11 @@ int main() {
         return EXIT_FAILURE;
     }
     //Run main loop while modbusRtu runs without critical errors
-    while (app.modbusRtuRun() != -1) {
-        //print data for test purpose
-        app.pemData_.printData();
+   while (app.modbusRtuRun() != -1) {
         //write pemData to modbusTCP registers
         app.modbusTcpWriteRegs();
         //@MQTT publish to broker
     }
-
     app.logger_->critical("main loop broken, program will exit");
     //clean upp code before exit
     return 0;

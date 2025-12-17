@@ -44,7 +44,8 @@ void modbusTCP::stop() {
     }
 }
 
-
+//take a vector of floats and return a vector of uint16_t( the method splits each 32bit value in to 2x16bit values
+//and places them in following order 1xfloat = regs[0] regs[1] etc.
 std::vector<uint16_t> modbusTCP::float_to_regs(const std::vector<float> &fdata) {
     std::vector<uint16_t> regs;
     regs.reserve(fdata.size()*2);
@@ -68,6 +69,7 @@ std::vector<uint16_t> modbusTCP::float_to_regs(const std::vector<float> &fdata) 
     return regs;
 }
 
+//takes vector of floats calls for float_to_regs and copys the reutrn value of regs to mapping struct(holding registers)
 bool modbusTCP::write_floats_to_holding_registers(int startAddr, const std::vector<float> &fdata) {
     if (startAddr < 0) return false;
     if (mb_mapping_ == nullptr || mb_mapping_ ->tab_registers == nullptr) return false;
@@ -118,6 +120,7 @@ bool modbusTCP::waitForActivity() {
     }
     return true;
 }
+//accept incoming connection bind int to server_socket_
 bool modbusTCP::acceptConnection() {
     sockaddr_in clientaddr{};
     socklen_t addr_len = sizeof(clientaddr);
@@ -132,11 +135,13 @@ bool modbusTCP::acceptConnection() {
     std::cout << "New client connected: socket " << newfd << std::endl;
     return true;
 }
+//set socket_ for active connection and handle query(will only accept read holding register otherwise it will disconnect
+//the client trying to write.
 void modbusTCP::replyQuery() {
     modbus_set_socket(ctx_, socket_);
     uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
     int rc = modbus_receive(ctx_, query);
-    if (rc > 0) {
+    if (rc > 0 && query[7] == 0x03){
         std::lock_guard<std::mutex> lock(mapping_mutex_);
         modbus_reply(ctx_, query, rc, mb_mapping_);
     } else {
@@ -181,6 +186,8 @@ void modbusTCP::run() {
         }
     }
 }
+
+
 //Destructor that frees upp memory of modbus struct ptrs
 //close serial port connection and free allocated memory for context ptrs
 modbusTCP::~modbusTCP() {
@@ -194,3 +201,6 @@ modbusTCP::~modbusTCP() {
         ctx_ = nullptr;
     }
 }
+
+
+
