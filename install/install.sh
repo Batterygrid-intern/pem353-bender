@@ -16,13 +16,19 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-echo "==> Stopping service (if already running)"
-systemctl stop "${APP_NAME}.service" 2>/dev/null || true
+if systemctl is-active --quiet "${APP_NAME}.service" 2>/dev/null; then
+  echo "==> Stopping service (if already running)"
+  systemctl stop "${APP_NAME}.service"
+fi
 
 echo "==> Creating service user '${APP_USER}' (if missing)"
 if ! id -u "$APP_USER" >/dev/null 2>&1; then
+  useradd --system --no-create-home --shell /usr/sbin/nologin --gid dialout "$APP_USER" 2>/dev/null || \
   useradd --system --no-create-home --shell /usr/sbin/nologin "$APP_USER" 2>/dev/null || true
 fi
+
+echo "==> Adding user to dialout group (for serial port access)"
+usermod -a -G dialout "$APP_USER" 2>/dev/null || true
 
 echo "==> Installing files to ${INSTALL_ROOT}"
 mkdir -p "$INSTALL_ROOT"
