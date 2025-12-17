@@ -9,6 +9,12 @@ Group=pem353
 SupplementaryGroups=dialout
 
 WorkingDirectory=/opt/pem353
+
+# Ensure log directory exists with correct permissions before starting
+ExecStartPre=/bin/mkdir -p /var/log/pem353
+ExecStartPre=/bin/chown pem353:pem353 /var/log/pem353
+ExecStartPre=/bin/chmod 755 /var/log/pem353
+
 ExecStart=/opt/pem353/bin/pem353
 
 Restart=on-failure
