@@ -1,0 +1,25 @@
+[Unit]
+Description=pem353 service
+After=network.target
+
+[Service]
+Type=simple
+User=pem353
+Group=pem353
+
+WorkingDirectory=/
+ExecStart=/opt/pem353/bin/pem353
+
+Restart=on-failure
+RestartSec=2
+
+# Port 502 utan root
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+NoNewPrivileges=true
+
+ReadOnlyPaths=/etc/pem353
+ReadWritePaths=/var/log/pem353
+
+[Install]
+WantedBy=multi-user.target
