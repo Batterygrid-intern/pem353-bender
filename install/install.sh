@@ -17,11 +17,11 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 echo "==> Stopping service (if already running)"
-systemctl stop "${APP_NAME}.service" || true
+systemctl stop "${APP_NAME}.service" 2>/dev/null || true
 
 echo "==> Creating service user '${APP_USER}' (if missing)"
 if ! id -u "$APP_USER" >/dev/null 2>&1; then
-  useradd --system --no-create-home --shell /usr/sbin/nologin "$APP_USER"
+  useradd --system --no-create-home --shell /usr/sbin/nologin "$APP_USER" 2>/dev/null || true
 fi
 
 echo "==> Installing files to ${INSTALL_ROOT}"
