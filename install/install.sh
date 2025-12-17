@@ -29,12 +29,12 @@ mkdir -p "$INSTALL_ROOT"
 cp -r "${SCRIPT_DIR}/../opt/${APP_NAME}/"* "$INSTALL_ROOT/"
 
 echo "==> Setting up config directory ${ETC_ROOT}"
-mkdir -p "$ETC_ROOT"
-if [[ ! -f "${ETC_ROOT}/pemConfigs.json" && -f "${INSTALL_ROOT}/defaults/pemConfigs.json" ]]; then
-  cp -a "${INSTALL_ROOT}/defaults/pemConfigs.json" "${ETC_ROOT}/pemConfigs.json"
-  echo "INFO: installed default config to ${ETC_ROOT}/pemConfigs.json"
+mkdir -p "${ETC_ROOT}/configs"
+if [[ ! -f "${ETC_ROOT}/configs/pemConfigs.json" && -f "${INSTALL_ROOT}/defaults/pemConfigs.json" ]]; then
+  cp -a "${INSTALL_ROOT}/defaults/pemConfigs.json" "${ETC_ROOT}/configs/pemConfigs.json"
+  echo "INFO: installed default config to ${ETC_ROOT}/configs/pemConfigs.json"
 else
-  echo "INFO: existing config preserved at ${ETC_ROOT}/pemConfigs.json"
+  echo "INFO: existing config preserved at ${ETC_ROOT}/configs/pemConfigs.json"
 fi
 
 echo "==> Setting up log directory ${LOG_ROOT}"
@@ -45,8 +45,8 @@ chmod 755 "$LOG_ROOT"
 echo "==> Setting ownership"
 chown -R root:root "$INSTALL_ROOT"
 chmod +x "${INSTALL_ROOT}/bin/${APP_NAME}"
-chown "${APP_USER}:${APP_USER}" "${ETC_ROOT}/pemConfigs.json"
-chmod 644 "${ETC_ROOT}/pemConfigs.json"
+chown "${APP_USER}:${APP_USER}" "${ETC_ROOT}/configs/pemConfigs.json"
+chmod 644 "${ETC_ROOT}/configs/pemConfigs.json"
 
 echo "==> Installing systemd service"
 if [[ -f "${SCRIPT_DIR}/../etc/systemd/system/${APP_NAME}.service" ]]; then
