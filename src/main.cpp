@@ -3,7 +3,7 @@
 
 int main() {
     // initialize application
-    std::string configFilePath = "etc/pem353/configs/pemConfigs.json";
+    std::string configFilePath = "/etc/pem353/configs/pemConfigs.json";
     application app(configFilePath);
     //setup modbusRTU context for port and connect to port
     if (app.modbusRtuSetup() == -1) {
