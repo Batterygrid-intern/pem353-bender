@@ -54,8 +54,14 @@ if [[ -f "$SYSTEMD_UNIT" ]]; then
   systemctl daemon-reload
 fi
 
-echo "==> Removing application: ${INSTALL_ROOT}"
+echo "==> Removing binary from /usr/local/bin"
+rm -f "/usr/local/bin/${APP_NAME}"
+
+echo "==> Removing libraries: ${INSTALL_ROOT}"
 rm -rf "$INSTALL_ROOT"
+
+echo "==> Removing working directory: /var/lib/${APP_NAME}"
+rm -rf "/var/lib/${APP_NAME}"
 
 if [[ "$REMOVE_CONFIG" == true ]]; then
   echo "==> Removing config: ${CONFIG_ROOT}"

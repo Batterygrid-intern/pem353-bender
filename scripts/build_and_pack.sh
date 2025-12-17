@@ -75,16 +75,22 @@ echo "[4/4] Creating deployment package..."
 VERSION=$(date +%Y%m%d_%H%M%S)
 PACKAGE_NAME="${APP_NAME}-deploy-${VERSION}.zip"
 
+# Create zip from inside deploy directory
+cd "$DEPLOY_DIR"
+zip -r "$ROOT_DIR/$PACKAGE_NAME" ./* >/dev/null
 cd "$ROOT_DIR"
-zip -r "$PACKAGE_NAME" deploy/ >/dev/null
 
 echo ""
 echo "==========================================="
 echo "✓ Package created: $PACKAGE_NAME"
 echo "==========================================="
+echo ""
+echo "Package contents:"
+unzip -l "$PACKAGE_NAME" | head -20
+echo ""
 echo "Size: $(du -h "$PACKAGE_NAME" | cut -f1)"
 echo ""
 echo "Deploy instructions:"
 echo "  1. scp $PACKAGE_NAME user@target:/tmp/"
-echo "  2. unzip $PACKAGE_NAME && cd deploy"
+echo "  2. cd /tmp && unzip $PACKAGE_NAME"
 echo "  3. sudo bash install.sh"
