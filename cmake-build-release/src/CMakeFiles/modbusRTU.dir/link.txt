@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmodbusRTU.a CMakeFiles/modbusRTU.dir/modbusRTU.cpp.o
-/usr/bin/ranlib libmodbusRTU.a

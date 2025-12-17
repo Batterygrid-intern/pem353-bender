@@ -1,2 +1,0 @@
-/usr/bin/ar qc libmodbusTCP.a CMakeFiles/modbusTCP.dir/modbusTCP.cpp.o
-/usr/bin/ranlib libmodbusTCP.a
