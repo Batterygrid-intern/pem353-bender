@@ -24,20 +24,28 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-# Skapa systemuser
-if ! id -u "$APP_USER" >/dev/null 2>&1; then
-  useradd --system --no-create-home --shell /usr/sbin/nologin "$APP_USER"
-fi
+# Skapa systemuser + grupp
 if ! getent group "$APP_GROUP" >/dev/null 2>&1; then
   groupadd --system "$APP_GROUP" || true
+fi
+if ! id -u "$APP_USER" >/dev/null 2>&1; then
+  useradd --system --no-create-home --shell /usr/sbin/nologin --gid "$APP_GROUP" "$APP_USER"
+fi
+
+# Lägg den som körde sudo (t.ex. bgs) i pem353-gruppen så den kan läsa loggar
+if [[ -n "${SUDO_USER:-}" && "${SUDO_USER}" != "root" ]]; then
+  usermod -a -G "$APP_GROUP" "$SUDO_USER" || true
+  echo "Info: lade till ${SUDO_USER} i gruppen ${APP_GROUP}. Logga ut/in för att gruppen ska gälla." >&2
 fi
 
 # Kataloger
 mkdir -p "$INSTALL_ROOT" "$ETC_DIR" "$LOG_DIR"
 chown -R root:root "$INSTALL_ROOT"
 chown -R root:root "/etc/${APP_NAME}"
+
+# Loggdir: gruppåtkomst + setgid så nya filer ärver gruppen
 chown -R "$APP_USER":"$APP_GROUP" "$LOG_DIR"
-chmod 0750 "$LOG_DIR"
+chmod 2775 "$LOG_DIR"
 
 # Kopiera program + libs
 if [[ ! -d "${PKG_ROOT}/opt/${APP_NAME}" ]]; then
@@ -46,12 +54,11 @@ if [[ ! -d "${PKG_ROOT}/opt/${APP_NAME}" ]]; then
 fi
 rsync -a --delete "${PKG_ROOT}/opt/${APP_NAME}/" "${INSTALL_ROOT}/"
 
-# Installera config på hårdkodad path
+# Installera config
 DEFAULT_CFG="${INSTALL_ROOT}/defaults/pemConfigs.json"
 TARGET_CFG="${ETC_DIR}/pemConfigs.json"
 
 if [[ -f "$DEFAULT_CFG" ]]; then
-  # skriv bara om den inte finns
   if [[ ! -f "$TARGET_CFG" ]]; then
     cp -a "$DEFAULT_CFG" "$TARGET_CFG"
   fi
@@ -85,7 +92,7 @@ systemctl daemon-reload
 systemctl enable "${APP_NAME}.service"
 systemctl restart "${APP_NAME}.service"
 
-# Brandvägg (valfritt, endast om --open-firewall)
+# Brandvägg (valfritt)
 if [[ "$OPEN_FIREWALL" -eq 1 ]]; then
   if command -v ufw >/dev/null 2>&1; then
     ufw allow 502/tcp || true

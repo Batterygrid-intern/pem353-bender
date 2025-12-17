@@ -17,20 +17,8 @@
     "NB_REGS": 20,
     "BIG_ENDIAN": 1
   },
-  "MQTT_PUB": {
-    "URI": "ssl://192.168.1.110:8883",
-    "TOPIC": "pem353",
-    "SITE": "bgs-local",
-    "CLIENT_ID": "pem_lager",
-    "QOS": 1,
-    "USERNAME": "pem_user",
-    "PASSWORD": "",
-    "PRESIST_DIR": "./mqtt_persist/",
-    "CONN_TIMEOUT": "5",
-    "RETAIN": 0
-  },
   "LOGGER": {
-    "PATH": "./logs/pemlog.txt",
+    "PATH": "/var/log/pem353/pemlog.txt",
     "HOUR": 23,
     "MINUTE": 59,
     "MAX_FILES": 20
