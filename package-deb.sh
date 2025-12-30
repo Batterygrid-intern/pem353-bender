@@ -47,7 +47,7 @@ mkdir -p "$DEB_DIR"
 # Create directory structure
 mkdir -p "$DEB_DIR/DEBIAN"
 mkdir -p "$DEB_DIR/usr/local/bin"
-mkdir -p "$DEB_DIR/etc/pem353"
+mkdir -p "$DEB_DIR/etc/pem353/configs"
 mkdir -p "$DEB_DIR/lib/systemd/system"
 mkdir -p "$DEB_DIR/var/log/pem353"
 
@@ -59,7 +59,7 @@ chmod +x "$DEB_DIR/usr/local/bin/pem353"
 # Copy config file if it exists
 if [ -f "configs/pemConfigs.json" ]; then
     echo -e "${YELLOW}Copying config file...${NC}"
-    cp configs/pemConfigs.json "$DEB_DIR/etc/pem353/"
+    cp configs/pemConfigs.json "$DEB_DIR/etc/pem353/configs/"
 fi
 
 # Create systemd service file
