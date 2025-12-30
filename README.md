@@ -174,3 +174,24 @@ embedded directly in my build system.
 
 
 ### Pahomqttcpp
+
+# 1. Install dependencies
+sudo ./install-deps.sh
+
+# 2. Build the application
+./build.sh
+
+# 3. Create .deb package
+./package-deb.shs
+
+# 4. Install the package
+sudo dpkg -i pem353-bender_1.0.0_*.deb
+
+# 5. Start the service
+sudo systemctl start pem353-bender
+
+
+./package-deb.sh
+sudo dpkg -r pem353-bender  # Remove old version
+sudo dpkg -i pem353-bender_1.0.0_arm64.deb
+sudo systemctl start pem353-bender
