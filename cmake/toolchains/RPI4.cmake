@@ -1,24 +1,21 @@
-# toolchain file for crosscompiling to arm64
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR aarch64)
 
-# specify the cross compiler
+set(TOOLCHAIN_PREFIX aarch64-linux-gnu)
 
-set(CMAKE_C_COMPILER aarch64-linux-gnu-gcc)
-set(CMAKE_CXX_COMPILER aarch64-linux-gnu-g++)
+set(CMAKE_C_COMPILER   ${TOOLCHAIN_PREFIX}-gcc)
+set(CMAKE_CXX_COMPILER ${TOOLCHAIN_PREFIX}-g++)
 
-# Where to look for the target enviroment
-set(CMAKE_FIND_ROOT_PATH /usr/aarch64-linux-gnu)
+set(CMAKE_SYSROOT $ENV{HOME}/rpi/sysroot)
 
-# search for programs in the build host directories
-set(CMAKE_FIND_ROOTH_PATH_MODE_PROGRAM never)
+set(CMAKE_FIND_ROOT_PATH ${CMAKE_SYSROOT})
 
-# search for libraries and headers in the target directories
-set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
-# Set the architecture-specific flags
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv8-a")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a")
-
+# Configure pkg-config for cross-compilation
+set(ENV{PKG_CONFIG_DIR} "")
+set(ENV{PKG_CONFIG_LIBDIR} "${CMAKE_SYSROOT}/usr/lib/pkgconfig:${CMAKE_SYSROOT}/usr/lib/aarch64-linux-gnu/pkgconfig:${CMAKE_SYSROOT}/usr/local/lib/pkgconfig")
+set(ENV{PKG_CONFIG_SYSROOT_DIR} "${CMAKE_SYSROOT}")
